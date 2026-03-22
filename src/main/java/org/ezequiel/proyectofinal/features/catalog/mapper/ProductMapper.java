@@ -11,15 +11,20 @@ import org.mapstruct.MappingTarget;
 public interface ProductMapper {
 
     @Mapping(target = "category", ignore = true)
+    @Mapping(target = "supplier", ignore = true)
     Product toEntity(ProductRequestDTO dto);
 
     @Mapping(target = "categoryId", source = "category.categoryId")
     @Mapping(target = "categoryName", source = "category.categoryName")
+    @Mapping(target = "supplierId", source = "supplier.supplierId")
+    @Mapping(target = "supplierName", source = "supplier.companyName")
     ProductResponseDTO toResponseDTO(Product entity);
 
     @Mapping(target = "categoryId", source = "category.categoryId")
+    @Mapping(target = "supplierId", source = "supplier.supplierId")
     ProductRequestDTO toRequestDTO(Product entity);
 
     @Mapping(target = "category", ignore = true)
+    @Mapping(target = "supplier", ignore = true)
     void updateEntityFromDTO(ProductRequestDTO dto, @MappingTarget Product entity);
 }

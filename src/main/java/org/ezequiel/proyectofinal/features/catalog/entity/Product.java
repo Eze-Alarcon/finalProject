@@ -18,8 +18,9 @@ public class Product {
     @Column(name = "product_name", nullable = false, length = 40)
     private String productName;
 
-    @Column(name = "supplier_id")
-    private Short supplierId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "supplier_id")
+    private Supplier supplier;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")

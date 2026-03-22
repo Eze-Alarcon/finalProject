@@ -6,9 +6,11 @@ import org.ezequiel.proyectofinal.features.catalog.dto.ProductRequestDTO;
 import org.ezequiel.proyectofinal.features.catalog.dto.ProductResponseDTO;
 import org.ezequiel.proyectofinal.features.catalog.entity.Category;
 import org.ezequiel.proyectofinal.features.catalog.entity.Product;
+import org.ezequiel.proyectofinal.features.catalog.entity.Supplier;
 import org.ezequiel.proyectofinal.features.catalog.mapper.ProductMapper;
 import org.ezequiel.proyectofinal.features.catalog.repository.CategoryRepository;
 import org.ezequiel.proyectofinal.features.catalog.repository.ProductRepository;
+import org.ezequiel.proyectofinal.features.catalog.repository.SupplierRepository;
 import org.ezequiel.proyectofinal.features.catalog.service.ProductService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +24,7 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final SupplierRepository supplierRepository;
     private final ProductMapper productMapper;
 
     @Override
@@ -44,6 +47,7 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponseDTO save(ProductRequestDTO dto) {
         Product product = productMapper.toEntity(dto);
         resolveCategory(product, dto.getCategoryId());
+        resolveSupplier(product, dto.getSupplierId());
         Product saved = productRepository.save(product);
         return productMapper.toResponseDTO(saved);
     }
@@ -55,6 +59,7 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() -> new ResourceNotFoundException("Product", id));
         productMapper.updateEntityFromDTO(dto, existing);
         resolveCategory(existing, dto.getCategoryId());
+        resolveSupplier(existing, dto.getSupplierId());
         Product updated = productRepository.save(existing);
         return productMapper.toResponseDTO(updated);
     }
@@ -75,6 +80,16 @@ public class ProductServiceImpl implements ProductService {
             product.setCategory(category);
         } else {
             product.setCategory(null);
+        }
+    }
+
+    private void resolveSupplier(Product product, Short supplierId) {
+        if (supplierId != null) {
+            Supplier supplier = supplierRepository.findById(supplierId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Supplier", supplierId));
+            product.setSupplier(supplier);
+        } else {
+            product.setSupplier(null);
         }
     }
 }

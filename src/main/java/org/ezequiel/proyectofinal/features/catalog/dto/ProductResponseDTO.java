@@ -14,6 +14,7 @@ public class ProductResponseDTO {
     private Short productId;
     private String productName;
     private Short supplierId;
+    private String supplierName;
     private Short categoryId;
     private String categoryName;
     private String quantityPerUnit;
