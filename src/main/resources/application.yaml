@@ -1,6 +1,6 @@
 spring:
   application:
-    name: store
+    name: proyecto-final-backend
   datasource:
     url: jdbc:postgresql://localhost:5432/northwind
     username: ${DB_USER}
