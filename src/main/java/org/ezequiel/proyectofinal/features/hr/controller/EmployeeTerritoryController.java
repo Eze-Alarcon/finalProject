@@ -7,6 +7,7 @@ import org.ezequiel.proyectofinal.features.hr.dto.EmployeeTerritoryResponseDTO;
 import org.ezequiel.proyectofinal.features.hr.service.EmployeeTerritoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,11 +20,13 @@ public class EmployeeTerritoryController {
     private final EmployeeTerritoryService employeeTerritoryService;
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CONSULTA')")
     public ResponseEntity<List<EmployeeTerritoryResponseDTO>> findAll() {
         return ResponseEntity.ok(employeeTerritoryService.findAll());
     }
 
     @GetMapping("/employee/{employeeId}/territory/{territoryId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CONSULTA')")
     public ResponseEntity<EmployeeTerritoryResponseDTO> findById(
             @PathVariable Short employeeId,
             @PathVariable String territoryId) {
@@ -31,6 +34,7 @@ public class EmployeeTerritoryController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
     public ResponseEntity<EmployeeTerritoryResponseDTO> save(
             @Valid @RequestBody EmployeeTerritoryRequestDTO dto) {
         EmployeeTerritoryResponseDTO created = employeeTerritoryService.save(dto);
@@ -38,6 +42,7 @@ public class EmployeeTerritoryController {
     }
 
     @DeleteMapping("/employee/{employeeId}/territory/{territoryId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
     public ResponseEntity<Void> delete(
             @PathVariable Short employeeId,
             @PathVariable String territoryId) {

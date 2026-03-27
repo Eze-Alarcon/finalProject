@@ -2,9 +2,13 @@ package org.ezequiel.proyectofinal.features.hr.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Entity
@@ -13,7 +17,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Employee {
+public class Employee implements UserDetails {
 
     @Id
     @Column(name = "employee_id")
@@ -76,4 +80,58 @@ public class Employee {
 
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<EmployeeTerritory> employeeTerritories = new ArrayList<>();
+
+    // Suppress Lombok getter for username to avoid conflict with UserDetails.getUsername()
+    @Getter(AccessLevel.NONE)
+    @Column(name = "username", unique = true, length = 50)
+    private String username;
+
+    @Column(name = "password_hash", length = 255)
+    private String passwordHash;
+
+    @Column(name = "role", length = 50)
+    private String role;
+
+    @Column(name = "activo")
+    private Boolean activo;
+
+    // --- UserDetails implementation ---
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        if (role == null || role.isBlank()) {
+            return List.of();
+        }
+        return List.of(new SimpleGrantedAuthority(role));
+    }
+
+    @Override
+    public String getPassword() {
+        return passwordHash;
+    }
+
+    @Override
+    public String getUsername() {
+        return username;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return activo != null && activo;
+    }
 }

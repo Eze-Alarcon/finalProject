@@ -14,6 +14,7 @@ public interface EmployeeMapper {
     @Mapping(target = "subordinates", ignore = true)
     @Mapping(target = "employeeTerritories", ignore = true)
     @Mapping(target = "photo", ignore = true)
+    @Mapping(target = "passwordHash", ignore = true)
     Employee toEntity(EmployeeRequestDTO dto);
 
     @Mapping(target = "reportsToId", source = "reportsTo.employeeId")
@@ -27,5 +28,6 @@ public interface EmployeeMapper {
     @Mapping(target = "subordinates", ignore = true)
     @Mapping(target = "employeeTerritories", ignore = true)
     @Mapping(target = "photo", ignore = true)
+    @Mapping(target = "passwordHash", ignore = true)
     void updateEntityFromDTO(EmployeeRequestDTO dto, @MappingTarget Employee entity);
 }

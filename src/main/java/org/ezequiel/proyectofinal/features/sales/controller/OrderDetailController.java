@@ -7,6 +7,7 @@ import org.ezequiel.proyectofinal.features.sales.dto.OrderDetailResponseDTO;
 import org.ezequiel.proyectofinal.features.sales.service.OrderDetailService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,11 +20,13 @@ public class OrderDetailController {
     private final OrderDetailService orderDetailService;
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'WAREHOUSE', 'GESTOR', 'CONSULTA')")
     public ResponseEntity<List<OrderDetailResponseDTO>> findAll() {
         return ResponseEntity.ok(orderDetailService.findAll());
     }
 
     @GetMapping("/order/{orderId}/product/{productId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'WAREHOUSE', 'GESTOR', 'CONSULTA')")
     public ResponseEntity<OrderDetailResponseDTO> findById(
             @PathVariable Short orderId,
             @PathVariable Short productId) {
@@ -31,6 +34,7 @@ public class OrderDetailController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'WAREHOUSE')")
     public ResponseEntity<OrderDetailResponseDTO> save(
             @Valid @RequestBody OrderDetailRequestDTO dto) {
         OrderDetailResponseDTO created = orderDetailService.save(dto);
@@ -38,6 +42,7 @@ public class OrderDetailController {
     }
 
     @PutMapping("/order/{orderId}/product/{productId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'WAREHOUSE')")
     public ResponseEntity<OrderDetailResponseDTO> update(
             @PathVariable Short orderId,
             @PathVariable Short productId,
@@ -46,6 +51,7 @@ public class OrderDetailController {
     }
 
     @DeleteMapping("/order/{orderId}/product/{productId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'WAREHOUSE')")
     public ResponseEntity<Void> delete(
             @PathVariable Short orderId,
             @PathVariable Short productId) {

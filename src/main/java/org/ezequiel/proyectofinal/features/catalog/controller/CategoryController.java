@@ -7,6 +7,7 @@ import org.ezequiel.proyectofinal.features.catalog.dto.CategoryResponseDTO;
 import org.ezequiel.proyectofinal.features.catalog.service.CategoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,22 +20,26 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'WAREHOUSE', 'GESTOR', 'CONSULTA')")
     public ResponseEntity<List<CategoryResponseDTO>> findAll() {
         return ResponseEntity.ok(categoryService.findAll());
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'WAREHOUSE', 'GESTOR', 'CONSULTA')")
     public ResponseEntity<CategoryResponseDTO> findById(@PathVariable Short id) {
         return ResponseEntity.ok(categoryService.findById(id));
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'WAREHOUSE')")
     public ResponseEntity<CategoryResponseDTO> save(@Valid @RequestBody CategoryRequestDTO dto) {
         CategoryResponseDTO created = categoryService.save(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'WAREHOUSE')")
     public ResponseEntity<CategoryResponseDTO> update(
             @PathVariable Short id,
             @Valid @RequestBody CategoryRequestDTO dto) {
@@ -42,6 +47,7 @@ public class CategoryController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'WAREHOUSE')")
     public ResponseEntity<Void> delete(@PathVariable Short id) {
         categoryService.delete(id);
         return ResponseEntity.noContent().build();
