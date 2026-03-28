@@ -19,6 +19,12 @@ public class AuthService {
     private final JwtService jwtService;
 
     public AuthResponseDTO login(LoginRequestDTO request) {
+        /*
+         * AuthenticationManager busca un componente llamado UserDetailsService
+         * que esta configurado en ApplicationConfig
+         *
+         * El authManager llama a la db
+         * */
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getUsername(),
@@ -26,9 +32,12 @@ public class AuthService {
                 )
         );
 
+        // el Principal es simplemente "el usuario actualmente identificado"
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String token = jwtService.generateToken(userDetails);
 
+        // el userDetails.getAuthorities() devuelve una lista de roles del usuario
+        // uso la stream api para obtener el primer rol del usuario
         String role = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .findFirst()

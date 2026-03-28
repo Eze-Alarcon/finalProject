@@ -31,6 +31,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         final String authHeader = request.getHeader("Authorization");
 
+        // Este filtro es para peticiones que no requieren autenticación
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -46,7 +47,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
+        /* El filtro SecurityContextHolder.getContext().getAuthentication() == null
+         * puede ser redundante, pero una petición puede ser redirigida internamente por el servidor
+         * (por ejemplo, a un controlador de errores).
+         * Si el usuario ya fue autenticado en la primera parte de la petición,
+         * no queremos que el filtro vuelva a validar el token y a llamar a la base de datos innecesariamente.
+        */
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            // esto esta en el ApplicationConfig.java
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
             if (jwtService.isTokenValid(jwt, userDetails)) {
@@ -55,11 +63,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         null,
                         userDetails.getAuthorities()
                 );
+                // con esta línea puedo obtener mas datos de la conexión como ip, etc
+                // de momento se guarda por lo que dure la llamada HTTP, esta info no se periste
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                // guardamos la autenticación en el contexto de seguridad
+                // si el servidor hace una redireccion la peticion no entrara en el bucle
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
 
+        // continuamos con el siguiente filtro en la cadena que sera el controller
         filterChain.doFilter(request, response);
     }
 }

@@ -25,6 +25,7 @@ public class ApplicationConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
+        // como la interfaz UserDetailsService solo tiene 1 metodo puedo usar una lambda y ahorrarme la definicion
         return username -> {
             AuthUserProjection projection = employeeRepository
                     .findAuthUserByUsername(username)
