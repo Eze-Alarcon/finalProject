@@ -23,17 +23,13 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public List<EmployeeResponseDTO> findAll() {
-        return employeeRepository.findAll()
-                .stream()
-                .map(employeeMapper::toResponseDTO)
-                .toList();
+        return employeeRepository.findAllProjected();
     }
 
     @Override
     public EmployeeResponseDTO findById(Short id) {
-        Employee employee = employeeRepository.findById(id)
+        return employeeRepository.findByIdProjected(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee", id));
-        return employeeMapper.toResponseDTO(employee);
     }
 
     @Override
