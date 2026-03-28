@@ -2,6 +2,7 @@ package org.ezequiel.proyectofinal.core.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -47,6 +48,19 @@ public class GlobalExceptionHandler {
         );
         problem.setTitle("Authentication Failed");
         problem.setType(URI.create("https://api.proyectofinal.ezequiel.org/errors/unauthorized"));
+        problem.setProperty("timestamp", Instant.now());
+        return problem;
+    }
+
+    /** Se usa cuando el usuario no tiene permisos para acceder al recurso. */
+    @ExceptionHandler(AccessDeniedException.class)
+    public ProblemDetail handleAccessDeniedException(AccessDeniedException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+                HttpStatus.FORBIDDEN,
+                "You do not have permission to access this resource"
+        );
+        problem.setTitle("Forbidden");
+        problem.setType(URI.create("https://api.proyectofinal.ezequiel.org/errors/forbidden"));
         problem.setProperty("timestamp", Instant.now());
         return problem;
     }
