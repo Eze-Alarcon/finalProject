@@ -14,9 +14,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ProductRequestDTO {
 
-    @NotNull(message = "Product ID is required")
-    private Short productId;
-
     @NotBlank(message = "Product name is required")
     @Size(max = 40, message = "Product name must not exceed 40 characters")
     private String productName;
