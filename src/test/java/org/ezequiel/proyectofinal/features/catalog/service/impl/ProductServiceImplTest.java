@@ -53,89 +53,77 @@ class ProductServiceImplTest {
     void setUp() {
         category = new Category();
         category.setCategoryId((short) 1);
-        category.setCategoryName("Test Category");
 
         supplier = new Supplier();
         supplier.setSupplierId((short) 1);
-        supplier.setCompanyName("Test Supplier");
 
         product = new Product();
         product.setProductId((short) 1);
-        product.setProductName("Test Product");
-        product.setCategory(category);
-        product.setSupplier(supplier);
 
         productRequestDTO = new ProductRequestDTO();
-        productRequestDTO.setProductId((short) 1);
-        productRequestDTO.setProductName("Test Product");
         productRequestDTO.setCategoryId((short) 1);
         productRequestDTO.setSupplierId((short) 1);
 
         productResponseDTO = new ProductResponseDTO();
         productResponseDTO.setProductId((short) 1);
-        productResponseDTO.setProductName("Test Product");
-        productResponseDTO.setCategoryId((short) 1);
-        productResponseDTO.setSupplierId((short) 1);
     }
 
     @Test
     void givenProducts_whenFindAll_thenReturnsMappedList() {
-        // Given
-        List<Product> products = Arrays.asList(product);
-        when(productRepository.findAll()).thenReturn(products);
-        when(productMapper.toResponseDTO(any(Product.class))).thenReturn(productResponseDTO);
+        List<Product> products = List.of(product);
 
-        // When
+        when(productRepository.findAll()).thenReturn(products);
+        when(productMapper.toResponseDTO(product)).thenReturn(productResponseDTO);
+
         List<ProductResponseDTO> result = productService.findAll();
 
-        // Then
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals(productResponseDTO.getProductName(), result.get(0).getProductName());
+
         verify(productRepository).findAll();
-        verify(productMapper).toResponseDTO(any(Product.class));
+        verify(productMapper).toResponseDTO(product);
+        verifyNoMoreInteractions(productRepository, productMapper);
     }
 
     @Test
     void givenExistingId_whenFindById_thenReturnsProduct() {
-        // Given
         when(productRepository.findById((short) 1)).thenReturn(Optional.of(product));
         when(productMapper.toResponseDTO(product)).thenReturn(productResponseDTO);
 
-        // When
         ProductResponseDTO result = productService.findById((short) 1);
 
-        // Then
         assertNotNull(result);
-        assertEquals(productResponseDTO.getProductId(), result.getProductId());
+
         verify(productRepository).findById((short) 1);
+        verify(productMapper).toResponseDTO(product);
+        verifyNoMoreInteractions(productRepository, productMapper);
     }
 
     @Test
-    void givenNonExistingId_whenFindById_thenThrowsResourceNotFoundException() {
-        // Given
+    void givenNonExistingId_whenFindById_thenThrowsException() {
         when(productRepository.findById((short) 1)).thenReturn(Optional.empty());
 
-        // When & Then
-        assertThrows(ResourceNotFoundException.class, () -> productService.findById((short) 1));
+        assertThrows(ResourceNotFoundException.class,
+                () -> productService.findById((short) 1));
+
         verify(productRepository).findById((short) 1);
         verifyNoInteractions(productMapper);
     }
 
     @Test
-    void givenProductRequest_whenSave_thenSavesProductCorrectly() {
-        // Given
+    void givenValidRequest_whenSave_thenPersistProductWithRelations() {
         when(productMapper.toEntity(productRequestDTO)).thenReturn(product);
         when(categoryRepository.findById((short) 1)).thenReturn(Optional.of(category));
         when(supplierRepository.findById((short) 1)).thenReturn(Optional.of(supplier));
         when(productRepository.save(product)).thenReturn(product);
         when(productMapper.toResponseDTO(product)).thenReturn(productResponseDTO);
 
-        // When
         ProductResponseDTO result = productService.save(productRequestDTO);
 
-        // Then
         assertNotNull(result);
+        assertEquals(category, product.getCategory());
+        assertEquals(supplier, product.getSupplier());
+
         verify(productMapper).toEntity(productRequestDTO);
         verify(categoryRepository).findById((short) 1);
         verify(supplierRepository).findById((short) 1);
@@ -144,20 +132,47 @@ class ProductServiceImplTest {
     }
 
     @Test
-    void givenExistingProductAndRequest_whenUpdate_thenUpdatesProduct() {
-        // Given
+    void givenNullCategoryAndSupplier_whenSave_thenSetNullRelations() {
+        productRequestDTO.setCategoryId(null);
+        productRequestDTO.setSupplierId(null);
+
+        when(productMapper.toEntity(productRequestDTO)).thenReturn(product);
+        when(productRepository.save(product)).thenReturn(product);
+        when(productMapper.toResponseDTO(product)).thenReturn(productResponseDTO);
+
+        productService.save(productRequestDTO);
+
+        assertNull(product.getCategory());
+        assertNull(product.getSupplier());
+
+        verify(categoryRepository, never()).findById(any());
+        verify(supplierRepository, never()).findById(any());
+    }
+
+    @Test
+    void givenNonExistingCategory_whenSave_thenThrowsException() {
+        when(productMapper.toEntity(productRequestDTO)).thenReturn(product);
+        when(categoryRepository.findById((short) 1)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class,
+                () -> productService.save(productRequestDTO));
+
+        verify(categoryRepository).findById((short) 1);
+        verify(productRepository, never()).save(any());
+    }
+
+    @Test
+    void givenExistingProduct_whenUpdate_thenUpdateAndSave() {
         when(productRepository.findById((short) 1)).thenReturn(Optional.of(product));
-        doNothing().when(productMapper).updateEntityFromDTO(productRequestDTO, product);
         when(categoryRepository.findById((short) 1)).thenReturn(Optional.of(category));
         when(supplierRepository.findById((short) 1)).thenReturn(Optional.of(supplier));
         when(productRepository.save(product)).thenReturn(product);
         when(productMapper.toResponseDTO(product)).thenReturn(productResponseDTO);
 
-        // When
         ProductResponseDTO result = productService.update((short) 1, productRequestDTO);
 
-        // Then
         assertNotNull(result);
+
         verify(productRepository).findById((short) 1);
         verify(productMapper).updateEntityFromDTO(productRequestDTO, product);
         verify(categoryRepository).findById((short) 1);
@@ -166,25 +181,22 @@ class ProductServiceImplTest {
     }
 
     @Test
-    void givenExistingId_whenDelete_thenDeletesProduct() {
-        // Given
+    void givenExistingId_whenDelete_thenDeleteProduct() {
         when(productRepository.existsById((short) 1)).thenReturn(true);
 
-        // When
         productService.delete((short) 1);
 
-        // Then
         verify(productRepository).existsById((short) 1);
         verify(productRepository).deleteById((short) 1);
     }
 
     @Test
-    void givenNonExistingId_whenDelete_thenThrowsResourceNotFoundException() {
-        // Given
+    void givenNonExistingId_whenDelete_thenThrowException() {
         when(productRepository.existsById((short) 1)).thenReturn(false);
 
-        // When & Then
-        assertThrows(ResourceNotFoundException.class, () -> productService.delete((short) 1));
+        assertThrows(ResourceNotFoundException.class,
+                () -> productService.delete((short) 1));
+
         verify(productRepository).existsById((short) 1);
         verify(productRepository, never()).deleteById(any());
     }
