@@ -2,6 +2,7 @@ package org.ezequiel.proyectofinal.core.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -33,6 +34,19 @@ public class GlobalExceptionHandler {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, errors);
         problem.setTitle("Validation Failed");
         problem.setType(URI.create("https://api.proyectofinal.ezequiel.org/errors/validation"));
+        problem.setProperty("timestamp", Instant.now());
+        return problem;
+    }
+
+    /** Se usa cuando ocurre un error de autenticación. */
+    @ExceptionHandler(AuthenticationException.class)
+    public ProblemDetail handleAuthenticationException(AuthenticationException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+                HttpStatus.UNAUTHORIZED,
+                "Invalid username or password"
+        );
+        problem.setTitle("Authentication Failed");
+        problem.setType(URI.create("https://api.proyectofinal.ezequiel.org/errors/unauthorized"));
         problem.setProperty("timestamp", Instant.now());
         return problem;
     }
