@@ -2,6 +2,7 @@ package org.ezequiel.proyectofinal.features.hr.repository;
 
 import org.ezequiel.proyectofinal.core.security.AuthUserProjection;
 import org.ezequiel.proyectofinal.features.hr.entity.Employee;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,6 +12,9 @@ import java.util.Optional;
 
 @Repository
 public interface EmployeeRepository extends JpaRepository<Employee, Short> {
+
+    @EntityGraph(attributePaths = {"reportsTo"})
+    Optional<Employee> findById(Short id);
 
     Optional<Employee> findByUsername(String username);
 

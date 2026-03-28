@@ -12,4 +12,7 @@ public interface ProductRepository extends JpaRepository<Product, Short> {
 
     @EntityGraph(attributePaths = {"category", "supplier"})
     List<Product> findAll();
+
+    @EntityGraph(attributePaths = {"category", "supplier"})
+    java.util.Optional<Product> findById(Short id);
 }
