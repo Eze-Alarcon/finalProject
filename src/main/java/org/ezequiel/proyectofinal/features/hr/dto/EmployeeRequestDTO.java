@@ -16,8 +16,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class EmployeeRequestDTO {
 
-    @NotNull(message = "Employee ID is required")
-    private Short employeeId;
 
     @NotBlank(message = "Last name is required")
     @Size(max = 20, message = "Last name must not exceed 20 characters")

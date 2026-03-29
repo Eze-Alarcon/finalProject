@@ -15,6 +15,7 @@ import java.time.LocalDate;
 public class Order {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_id")
     private Short orderId;
 

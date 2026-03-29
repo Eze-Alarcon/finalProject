@@ -13,8 +13,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class UsStateRequestDTO {
 
-    @NotNull(message = "State ID is required")
-    private Short stateId;
 
     @Size(max = 100, message = "State name must not exceed 100 characters")
     private String stateName;

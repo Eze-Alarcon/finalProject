@@ -1,7 +1,6 @@
 @endpointLogin = {{host}}/auth/login
 @endpoint = {{host}}/suppliers
 @getOne = 1
-@id = 50
 
 ### Login
 POST {{endpointLogin}}
@@ -39,7 +38,6 @@ Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
 {
-  "supplierId": {{id}},
   "companyName": "Nombre falso",
   "contactName": "Alguien",
   "contactTitle": "Owner",
@@ -86,7 +84,6 @@ Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
 {
-  "supplierId": {{id}},
   "companyName": "Nombre falso",
   "contactName": "Alguien",
   "contactTitle": "Owner",
@@ -101,24 +98,28 @@ Authorization: Bearer {{auth_token}}
 }
 
 > {%
-    client.assert(response.status === 201, "No se ha creado, el usuario no tiene permisos");
+    client.assert(response.status === 201, "No se ha creado el estado");
 
-    client.log(response.body);
+    let nuevoId = response.body["supplierId"];
+
+    // Lo guardamos en una variable global
+    client.global.set("created_supplier_id", nuevoId);
+
+    client.log("Supplier creado con el ID: " + nuevoId);
 %}
 
 
 ### Probar verificar creacion
-GET {{endpoint}}/{{id}}
+GET {{endpoint}}/{{created_supplier_id}}
 Authorization: Bearer {{auth_token}}
 
 
 ### Actualizar (hay que enviar todo el objeto)
-PUT {{endpoint}}/{{id}}
+PUT {{endpoint}}/{{created_supplier_id}}
 Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
 {
-  "supplierId": {{id}},
   "companyName": "Nombre falso",
   "contactName": "Alguien",
   "contactTitle": "Empleado mentiroso",
@@ -134,10 +135,10 @@ Authorization: Bearer {{auth_token}}
 
 
 ### Borrar
-DELETE {{endpoint}}/{{id}}
+DELETE {{endpoint}}/{{created_supplier_id}}
 Authorization: Bearer {{auth_token}}
 
 
 ### Comprobar borrado
-GET {{endpoint}}/{{id}}
+GET {{endpoint}}/{{created_supplier_id}}
 Authorization: Bearer {{auth_token}}

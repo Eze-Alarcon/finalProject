@@ -12,6 +12,7 @@ import lombok.*;
 public class Shipper {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "shipper_id")
     private Short shipperId;
 

@@ -1,5 +1,8 @@
+@endpointLogin = {{host}}/auth/login
+@endpoint = {{host}}/us-states
+
 ### Login
-POST {{host}}/api/v1/auth/login
+POST {{endpointLogin}}
 Content-Type: application/json
 
 {
@@ -18,62 +21,60 @@ Content-Type: application/json
 
 
 ### Probar endpoint de traer todos
-GET http://localhost:8080/api/v1/us-states
+GET {{endpoint}}
 # Aquí inyectamos la variable que acabamos de guardar
 Authorization: Bearer {{auth_token}}
 
 
 ### Probar traer solo 1
-GET http://localhost:8080/api/v1/us-states/1
+GET {{endpoint}}/1
 Authorization: Bearer {{auth_token}}
 
 
 
-### Crear un estado
-@id = 100
-POST http://localhost:8080/api/v1/us-states
+### Crear
+POST {{endpoint}}
 Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
 {
-  "stateId": {{id}},
   "stateName": "Estado Falso",
   "stateAbbr": "es",
   "stateRegion": "center"
 }
 
 > {%
-    if (response.status === 401) {
-        client.log("");
-    }
     client.assert(response.status === 201, "No se ha creado el estado");
 
+    let nuevoId = response.body["stateId"];
 
-    client.log(response.body);
+    // Lo guardamos en una variable global
+    client.global.set("created_state_id", nuevoId);
+
+    client.log("Estado creado con el ID: " + nuevoId);
 %}
 
-### Probar verificar creacion del estado 100
-GET http://localhost:8080/api/v1/us-states/{{id}}
+### Probar verificar creacion del estado
+GET {{endpoint}}/{{created_state_id}}
 Authorization: Bearer {{auth_token}}
 
 
-### Actualizamos el estado (hay que enviar todo el objeto)
-PUT http://localhost:8080/api/v1/us-states/{{id}}
+### Actualizamos el estado
+PUT {{endpoint}}/{{created_state_id}}
 Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
 {
-  "stateId": {{id}},
-  "stateName": "Falso estado",
+  "stateName": "Falso estado modificado",
   "stateAbbr": "fe",
   "stateRegion": "center"
 }
 
 ### Borrar el estado
-DELETE http://localhost:8080/api/v1/us-states/{{id}}
+DELETE {{endpoint}}/{{created_state_id}}
 Authorization: Bearer {{auth_token}}
 
 
-### Probar borrado del estado 100
-GET http://localhost:8080/api/v1/us-states/{{id}}
+### Probar borrado del estado (Debería dar 404)
+GET {{endpoint}}/{{created_state_id}}
 Authorization: Bearer {{auth_token}}

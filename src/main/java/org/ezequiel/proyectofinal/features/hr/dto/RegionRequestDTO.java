@@ -14,8 +14,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class RegionRequestDTO {
 
-    @NotNull(message = "Region ID is required")
-    private Short regionId;
 
     @NotBlank(message = "Region description is required")
     @Size(max = 60, message = "Region description must not exceed 60 characters")

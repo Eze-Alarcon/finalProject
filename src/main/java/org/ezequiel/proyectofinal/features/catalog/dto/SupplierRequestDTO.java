@@ -14,8 +14,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class SupplierRequestDTO {
 
-    @NotNull(message = "Supplier ID is required")
-    private Short supplierId;
 
     @NotBlank(message = "Company name is required")
     @Size(max = 40, message = "Company name must not exceed 40 characters")

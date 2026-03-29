@@ -14,8 +14,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class CategoryRequestDTO {
 
-    @NotNull(message = "Category ID is required")
-    private Short categoryId;
 
     @NotBlank(message = "Category name is required")
     @Size(max = 15, message = "Category name must not exceed 15 characters")

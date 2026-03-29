@@ -14,8 +14,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class OrderRequestDTO {
 
-    @NotNull(message = "Order ID is required")
-    private Short orderId;
 
     private String customerId;
 

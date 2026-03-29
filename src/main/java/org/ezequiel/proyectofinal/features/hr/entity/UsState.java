@@ -12,6 +12,7 @@ import lombok.*;
 public class UsState {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "state_id")
     private Short stateId;
 

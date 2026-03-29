@@ -20,6 +20,7 @@ import java.util.List;
 public class Employee implements UserDetails {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "employee_id")
     private Short employeeId;
 

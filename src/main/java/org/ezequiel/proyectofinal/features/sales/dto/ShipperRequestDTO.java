@@ -14,8 +14,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ShipperRequestDTO {
 
-    @NotNull(message = "Shipper ID is required")
-    private Short shipperId;
 
     @NotBlank(message = "Company name is required")
     @Size(max = 40, message = "Company name must not exceed 40 characters")
