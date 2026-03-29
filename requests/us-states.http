@@ -1,0 +1,79 @@
+### Login
+POST {{host}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "username": "{{userGestor}}",
+  "password": "{{pass}}"
+}
+
+> {%
+    client.assert(response.status === 200, "El login falló");
+    let jwt = response.body["token"];
+    // Guardamos el token en una variable global de IntelliJ
+    client.global.set("auth_token", jwt);
+
+    client.log("¡Token capturado con éxito!");
+%}
+
+
+### Probar endpoint de traer todos
+GET http://localhost:8080/api/v1/us-states
+# Aquí inyectamos la variable que acabamos de guardar
+Authorization: Bearer {{auth_token}}
+
+
+### Probar traer solo 1
+GET http://localhost:8080/api/v1/us-states/1
+Authorization: Bearer {{auth_token}}
+
+
+
+### Crear un estado
+@id = 100
+POST http://localhost:8080/api/v1/us-states
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "stateId": {{id}},
+  "stateName": "Estado Falso",
+  "stateAbbr": "es",
+  "stateRegion": "center"
+}
+
+> {%
+    if (response.status === 401) {
+        client.log("");
+    }
+    client.assert(response.status === 201, "No se ha creado el estado");
+
+
+    client.log(response.body);
+%}
+
+### Probar verificar creacion del estado 100
+GET http://localhost:8080/api/v1/us-states/{{id}}
+Authorization: Bearer {{auth_token}}
+
+
+### Actualizamos el estado (hay que enviar todo el objeto)
+PUT http://localhost:8080/api/v1/us-states/{{id}}
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "stateId": {{id}},
+  "stateName": "Falso estado",
+  "stateAbbr": "fe",
+  "stateRegion": "center"
+}
+
+### Borrar el estado
+DELETE http://localhost:8080/api/v1/us-states/{{id}}
+Authorization: Bearer {{auth_token}}
+
+
+### Probar borrado del estado 100
+GET http://localhost:8080/api/v1/us-states/{{id}}
+Authorization: Bearer {{auth_token}}

@@ -3,7 +3,7 @@ POST {{host}}/api/v1/auth/login
 Content-Type: application/json
 
 {
-  "username": "local.consulta",
+  "username": "{{userWarehouse}}",
   "password": "{{pass}}"
 }
 
@@ -22,12 +22,12 @@ Content-Type: application/json
 %}
 
 
-### Probar Endpoint Protegido (usando la variable de auth)
+### Listar todos los estados
 GET http://localhost:8080/api/v1/us-states
 # Aquí inyectamos la variable que acabamos de guardar
 Authorization: Bearer {{auth_token}}
 
 
-### Probar otro Endpoint Protegido
+### Traer 1
 GET http://localhost:8080/api/v1/us-states/1
 Authorization: Bearer {{auth_token}}
