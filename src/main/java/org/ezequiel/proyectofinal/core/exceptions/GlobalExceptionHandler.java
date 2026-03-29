@@ -3,6 +3,7 @@ package org.ezequiel.proyectofinal.core.exceptions;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AccountStatusException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -48,6 +49,19 @@ public class GlobalExceptionHandler {
         );
         problem.setTitle("Authentication Failed");
         problem.setType(URI.create("https://api.proyectofinal.ezequiel.org/errors/unauthorized"));
+        problem.setProperty("timestamp", Instant.now());
+        return problem;
+    }
+
+    /** Se usa cuando la cuenta del usuario está deshabilitada, bloqueada o expirada. */
+    @ExceptionHandler(AccountStatusException.class)
+    public ProblemDetail handleAccountStatusException(AccountStatusException ex) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+                HttpStatus.UNAUTHORIZED,
+                "User account is disabled or locked"
+        );
+        problem.setTitle("Account Status Error");
+        problem.setType(URI.create("https://api.proyectofinal.ezequiel.org/errors/account-status"));
         problem.setProperty("timestamp", Instant.now());
         return problem;
     }

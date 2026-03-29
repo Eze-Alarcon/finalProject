@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
+import org.springframework.security.authentication.AccountStatusUserDetailsChecker;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,6 +23,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+    private final AccountStatusUserDetailsChecker detailsChecker = new AccountStatusUserDetailsChecker();
 
     @Override
     protected void doFilterInternal(
@@ -57,18 +59,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // esto esta en el ApplicationConfig.java
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-            if (jwtService.isTokenValid(jwt, userDetails)) {
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities()
-                );
-                // con esta línea puedo obtener mas datos de la conexión como ip, etc
-                // de momento se guarda por lo que dure la llamada HTTP, esta info no se periste
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                // guardamos la autenticación en el contexto de seguridad
-                // si el servidor hace una redireccion la peticion no entrara en el bucle
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+            // Validamos que la cuenta esté habilitada, no expirada, etc.
+            // Si no es válida, lanzará una excepción que cortará el flujo de autenticación para esta petición.
+            try {
+                detailsChecker.check(userDetails);
+
+                if (jwtService.isTokenValid(jwt, userDetails)) {
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
+                    );
+                    // con esta línea puedo obtener mas datos de la conexión como ip, etc
+                    // de momento se guarda por lo que dure la llamada HTTP, esta info no se periste
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    // guardamos la autenticación en el contexto de seguridad
+                    // si el servidor hace una redireccion la peticion no entrara en el bucle
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
+            } catch (Exception e) {
+                // Si la cuenta está deshabilitada o bloqueada, no establecemos la autenticación
+                // y dejamos que continúe la cadena de filtros para que Spring Security maneje el acceso denegado.
             }
         }
 

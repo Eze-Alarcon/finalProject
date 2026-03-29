@@ -53,7 +53,7 @@ class AuthControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.title").value("Authentication Failed"))
-                .andExpect(jsonPath("$.detail").value("Invalid username or password"))
+                .andExpect(jsonPath("$.detail").value("Bad credentials"))
                 .andExpect(jsonPath("$.status").value(401));
     }
 }

@@ -5,6 +5,7 @@ import org.ezequiel.proyectofinal.core.security.JwtService;
 import org.ezequiel.proyectofinal.features.auth.dto.AuthResponseDTO;
 import org.ezequiel.proyectofinal.features.auth.dto.LoginRequestDTO;
 import org.ezequiel.proyectofinal.features.auth.dto.RefreshTokenRequestDTO;
+import org.springframework.security.authentication.AccountStatusUserDetailsChecker;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,6 +23,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
     private final JwtService jwtService;
+    private final AccountStatusUserDetailsChecker detailsChecker = new AccountStatusUserDetailsChecker();
 
     // Autentica al usuario y genera un par de tokens (access y refresh)
     public AuthResponseDTO login(LoginRequestDTO request) {
@@ -29,7 +31,8 @@ public class AuthService {
          * AuthenticationManager busca un componente llamado UserDetailsService
          * que esta configurado en ApplicationConfig
          *
-         * El authManager llama a la db
+         * El authManager llama a la db y valida las credenciales y el estado de la cuenta
+         * (isEnabled, isAccountNonLocked, etc.) automáticamente a través de DaoAuthenticationProvider.
          *
          * UsernamePasswordAuthenticationToken es un contenedor de credencial de un usuario aún no autenticado
          * */
@@ -63,6 +66,9 @@ public class AuthService {
         if (username != null) {
             // El UserDetailsService es el que se encarga de consultar la db
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+            // Validamos explícitamente el estado de la cuenta (isEnabled, isAccountNonLocked, etc.)
+            detailsChecker.check(userDetails);
 
             // El jwtService es el que se encarga de validar el refresh token
             if (jwtService.isTokenValid(refreshToken, userDetails)) {
