@@ -19,18 +19,24 @@ public class JwtService {
 
     private final SecretKey secretKey;
     private final long accessTokenExpiration;
+    private final long refreshTokenExpiration;
 
     public JwtService(
             @Value("${spring.jwt.secret}") String secret,
-            @Value("${spring.jwt.accessTokenExpiration}") long accessTokenExpiration) {
+            @Value("${spring.jwt.accessTokenExpiration}") long accessTokenExpiration,
+            @Value("${spring.jwt.refreshTokenExpiration}") long refreshTokenExpiration) {
         this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.accessTokenExpiration = accessTokenExpiration * 1000L; // convert seconds to ms
+        this.refreshTokenExpiration = refreshTokenExpiration * 1000L; // convert seconds to ms
     }
 
+    // Genera un access token para el usuario con claims vacíos
     public String generateToken(UserDetails userDetails) {
+        // llamo al generateToken definido abajo (Overloading / sobrecarga)
         return generateToken(new HashMap<>(), userDetails);
     }
 
+    // Genera un access token que acepta claims adicionales y expiración corta
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         return Jwts.builder()
                 .claims(extraClaims)
@@ -41,6 +47,17 @@ public class JwtService {
                 .compact();
     }
 
+    // Genera un refresh token de larga duracion sin claims adicionales
+    public String generateRefreshToken(UserDetails userDetails) {
+        return Jwts.builder()
+                .subject(userDetails.getUsername())
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + refreshTokenExpiration))
+                .signWith(secretKey)
+                .compact();
+    }
+
+    // Extrae el nombre de usuario contenido en el token JWT
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
@@ -52,7 +69,7 @@ public class JwtService {
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
-        // actualmente, esto es redundante, pero es para validar que el usuario es valido en ese instante
+        // actualmente, esto es redundante, pero es para validar que el usuario es válido en ese instante
         return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 

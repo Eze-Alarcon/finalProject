@@ -44,7 +44,7 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleAuthenticationException(AuthenticationException ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(
                 HttpStatus.UNAUTHORIZED,
-                "Invalid username or password"
+                ex.getMessage()
         );
         problem.setTitle("Authentication Failed");
         problem.setType(URI.create("https://api.proyectofinal.ezequiel.org/errors/unauthorized"));

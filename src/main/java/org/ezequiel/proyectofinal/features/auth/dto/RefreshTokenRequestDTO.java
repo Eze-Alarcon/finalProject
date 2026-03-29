@@ -1,5 +1,6 @@
 package org.ezequiel.proyectofinal.features.auth.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,10 +10,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuthResponseDTO {
+public class RefreshTokenRequestDTO {
 
-    private String token;
+    @NotBlank(message = "El refresh token es obligatorio")
     private String refreshToken;
-    private String username;
-    private String role;
 }
