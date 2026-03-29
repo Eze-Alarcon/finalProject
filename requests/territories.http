@@ -1,0 +1,81 @@
+@endpointLogin = {{host}}/auth/login
+@endpoint = {{host}}/territories
+
+### Login
+POST {{endpointLogin}}
+Content-Type: application/json
+
+{
+  "username": "{{userGestor}}",
+  "password": "{{pass}}"
+}
+
+> {%
+    client.assert(response.status === 200, "El login falló");
+    let jwt = response.body["token"];
+    // Guardamos el token en una variable global de IntelliJ
+    client.global.set("auth_token", jwt);
+
+    client.log("¡Token capturado con éxito!");
+%}
+
+
+### Probar endpoint de traer todos
+GET {{endpoint}}
+# Aquí inyectamos la variable que acabamos de guardar
+Authorization: Bearer {{auth_token}}
+
+
+### Probar traer solo 1
+@getOne = 01581
+GET {{endpoint}}/{{getOne}}
+Authorization: Bearer {{auth_token}}
+
+
+
+### Crear
+@id = 99999
+POST {{endpoint}}
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "territoryId": "{{id}}",
+  "territoryDescription": "Testing",
+  "regionId": 1
+}
+
+> {%
+    if (response.status === 401) {
+        client.log("");
+    }
+    client.assert(response.status === 201, "No se ha creado el estado");
+
+
+    client.log(response.body);
+%}
+
+### Probar verificar creacion
+GET {{endpoint}}/{{id}}
+Authorization: Bearer {{auth_token}}
+
+
+### Actualizar (hay que enviar todo el objeto)
+PUT {{endpoint}}/{{id}}
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "territoryId": "{{id}}",
+  "territoryDescription": "Madrid",
+  "regionId": 2
+}
+
+### Borrar
+DELETE {{endpoint}}/{{id}}
+Authorization: Bearer {{auth_token}}
+
+
+### Comprobar borrado
+GET {{endpoint}}/{{id}}
+Authorization: Bearer {{auth_token}}
