@@ -1,0 +1,160 @@
+@endpointLogin = {{host}}/auth/login
+@endpoint = {{host}}/employees
+@getOne = 1
+
+### Login Consulta
+POST {{endpointLogin}}
+Content-Type: application/json
+
+{
+  "username": "{{userConsulta}}",
+  "password": "{{pass}}"
+}
+
+> {%
+    client.assert(response.status === 200, "El login falló");
+    let jwt = response.body["token"];
+    client.global.set("auth_token", jwt);
+    client.log("¡Token capturado con éxito!");
+%}
+
+
+### GET All
+GET {{endpoint}}
+Authorization: Bearer {{auth_token}}
+
+
+### GET by ID
+GET {{endpoint}}/{{getOne}}
+Authorization: Bearer {{auth_token}}
+
+
+### POST Fallido (403)
+POST {{endpoint}}
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "lastName": "Prohibido",
+  "firstName": "Empleado",
+  "title": "Sales Representative",
+  "titleOfCourtesy": "Mr.",
+  "birthDate": "1960-05-29",
+  "hireDate": "1992-05-01",
+  "address": "507 - 20th Ave. E.\nApt. 2A",
+  "city": "Seattle",
+  "region": "WA",
+  "postalCode": "98122",
+  "country": "USA",
+  "homePhone": "(206) 555-9857",
+  "extension": "5467",
+  "notes": "Education includes a BA in psychology from Colorado State University in 1970.",
+  "reportsToId": 2,
+  "photoPath": "http://accweb/emmployees/davolio.bmp",
+  "username": "davolio",
+  "role": "ROLE_USER",
+  "activo": true
+}
+
+> {%
+    client.assert(response.status === 403, "No se esperaba que el usuario tuviera permisos");
+%}
+
+
+### Login Autorizado (GESTOR)
+POST {{endpointLogin}}
+Content-Type: application/json
+
+{
+  "username": "{{userGestor}}",
+  "password": "{{pass}}"
+}
+
+> {%
+    client.assert(response.status === 200, "El login falló");
+    let jwt = response.body["token"];
+    client.global.set("auth_token", jwt);
+    client.log("¡Token de Gestor capturado!");
+%}
+
+
+### POST Exitoso (201)
+POST {{endpoint}}
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "lastName": "Nuevo",
+  "firstName": "Empleado",
+  "title": "Sales Representative",
+  "titleOfCourtesy": "Mr.",
+  "birthDate": "1980-01-01",
+  "hireDate": "2023-01-01",
+  "address": "Calle Principal 123",
+  "city": "Madrid",
+  "region": "MD",
+  "postalCode": "28001",
+  "country": "Spain",
+  "homePhone": "912345678",
+  "extension": "1234",
+  "notes": "Empleado de prueba",
+  "reportsToId": 1,
+  "photoPath": "/path/to/photo.jpg",
+  "username": "empleado_test",
+  "role": "ROLE_CONSULTA",
+  "activo": true
+}
+
+> {%
+    client.assert(response.status === 201, "No se ha creado el empleado");
+    let nuevoId = response.body["employeeId"];
+    client.global.set("created_employee_id", nuevoId);
+    client.log("Creado con el ID: " + nuevoId);
+%}
+
+
+### GET Verificación
+GET {{endpoint}}/{{created_employee_id}}
+Authorization: Bearer {{auth_token}}
+
+
+### PUT (Update)
+PUT {{endpoint}}/{{created_employee_id}}
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "lastName": "Modificado",
+  "firstName": "Empleado",
+  "title": "Senior Sales Representative",
+  "titleOfCourtesy": "Mr.",
+  "birthDate": "1980-01-01",
+  "hireDate": "2023-01-01",
+  "address": "Calle Nueva 456",
+  "city": "Madrid",
+  "region": "MD",
+  "postalCode": "28002",
+  "country": "Spain",
+  "homePhone": "912345678",
+  "extension": "4321",
+  "notes": "Empleado de prueba actualizado",
+  "reportsToId": 1,
+  "photoPath": "/path/to/photo_updated.jpg",
+  "username": "empleado_test",
+  "role": "ROLE_CONSULTA",
+  "activo": true
+}
+
+
+### DELETE
+DELETE {{endpoint}}/{{created_employee_id}}
+Authorization: Bearer {{auth_token}}
+
+
+### GET (404/Verificación)
+GET {{endpoint}}/{{created_employee_id}}
+Authorization: Bearer {{auth_token}}
+
+> {%
+    client.assert(response.status === 404, "El recurso debería haber sido borrado");
+%}

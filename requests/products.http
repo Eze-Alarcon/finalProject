@@ -1,0 +1,130 @@
+@endpointLogin = {{host}}/auth/login
+@endpoint = {{host}}/products
+@getOne = 1
+
+### Login Consulta
+POST {{endpointLogin}}
+Content-Type: application/json
+
+{
+  "username": "{{userConsulta}}",
+  "password": "{{pass}}"
+}
+
+> {%
+    client.assert(response.status === 200, "El login falló");
+    let jwt = response.body["token"];
+    client.global.set("auth_token", jwt);
+    client.log("¡Token capturado con éxito!");
+%}
+
+
+### GET All
+GET {{endpoint}}
+Authorization: Bearer {{auth_token}}
+
+
+### GET by ID
+GET {{endpoint}}/{{getOne}}
+Authorization: Bearer {{auth_token}}
+
+
+### POST Fallido (403)
+POST {{endpoint}}
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "productName": "Producto Prohibido",
+  "supplierId": 1,
+  "categoryId": 1,
+  "quantityPerUnit": "10 boxes",
+  "unitPrice": 18.0,
+  "unitsInStock": 39,
+  "unitsOnOrder": 0,
+  "reorderLevel": 10,
+  "discontinued": 0
+}
+
+> {%
+    client.assert(response.status === 403, "No se esperaba que el usuario tuviera permisos");
+%}
+
+
+### Login Autorizado (WAREHOUSE)
+POST {{endpointLogin}}
+Content-Type: application/json
+
+{
+  "username": "{{userWarehouse}}",
+  "password": "{{pass}}"
+}
+
+> {%
+    client.assert(response.status === 200, "El login falló");
+    let jwt = response.body["token"];
+    client.global.set("auth_token", jwt);
+    client.log("¡Token de Warehouse capturado!");
+%}
+
+
+### POST Exitoso (201)
+POST {{endpoint}}
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "productName": "Nuevo Producto",
+  "supplierId": 1,
+  "categoryId": 1,
+  "quantityPerUnit": "24 - 12 oz bottles",
+  "unitPrice": 19.0,
+  "unitsInStock": 17,
+  "unitsOnOrder": 40,
+  "reorderLevel": 25,
+  "discontinued": 0
+}
+
+> {%
+    client.assert(response.status === 201, "No se ha creado el producto");
+    let nuevoId = response.body["productId"];
+    client.global.set("created_product_id", nuevoId);
+    client.log("Creado con el ID: " + nuevoId);
+%}
+
+
+### GET Verificación
+GET {{endpoint}}/{{created_product_id}}
+Authorization: Bearer {{auth_token}}
+
+
+### PUT (Update)
+PUT {{endpoint}}/{{created_product_id}}
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "productName": "Producto Actualizado",
+  "supplierId": 1,
+  "categoryId": 1,
+  "quantityPerUnit": "24 - 12 oz bottles",
+  "unitPrice": 21.5,
+  "unitsInStock": 15,
+  "unitsOnOrder": 30,
+  "reorderLevel": 25,
+  "discontinued": 0
+}
+
+
+### DELETE
+DELETE {{endpoint}}/{{created_product_id}}
+Authorization: Bearer {{auth_token}}
+
+
+### GET (404/Verificación)
+GET {{endpoint}}/{{created_product_id}}
+Authorization: Bearer {{auth_token}}
+
+> {%
+    client.assert(response.status === 404, "El recurso debería haber sido borrado");
+%}

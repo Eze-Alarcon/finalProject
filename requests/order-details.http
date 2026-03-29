@@ -1,0 +1,123 @@
+@endpointLogin = {{host}}/auth/login
+@endpoint = {{host}}/order-details
+@orderId = 10248
+@productId = 11
+
+### Login Consulta
+POST {{endpointLogin}}
+Content-Type: application/json
+
+{
+  "username": "{{userConsulta}}",
+  "password": "{{pass}}"
+}
+
+> {%
+    client.assert(response.status === 200, "El login falló");
+    let jwt = response.body["token"];
+    client.global.set("auth_token", jwt);
+    client.log("¡Token capturado con éxito!");
+%}
+
+
+### GET All
+GET {{endpoint}}
+Authorization: Bearer {{auth_token}}
+
+
+### GET by ID (Compuesta)
+GET {{endpoint}}/order/{{orderId}}/product/{{productId}}
+Authorization: Bearer {{auth_token}}
+
+
+### POST Fallido (403)
+POST {{endpoint}}
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "orderId": 10248,
+  "productId": 42,
+  "unitPrice": 9.8,
+  "quantity": 10,
+  "discount": 0.0
+}
+
+> {%
+    client.assert(response.status === 403, "No se esperaba que el usuario tuviera permisos");
+%}
+
+
+### Login Autorizado (WAREHOUSE)
+POST {{endpointLogin}}
+Content-Type: application/json
+
+{
+  "username": "{{userWarehouse}}",
+  "password": "{{pass}}"
+}
+
+> {%
+    client.assert(response.status === 200, "El login falló");
+    let jwt = response.body["token"];
+    client.global.set("auth_token", jwt);
+    client.log("¡Token de Warehouse capturado!");
+%}
+
+
+### POST Exitoso (201)
+# Usaremos un OrderId de un pedido que acabamos de crear en orders.http o uno existente conocido.
+# Para esta prueba usaremos 10249 y producto 14.
+@newOrderId = 10249
+@newProductId = 14
+POST {{endpoint}}
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "orderId": {{newOrderId}},
+  "productId": {{newProductId}},
+  "unitPrice": 18.6,
+  "quantity": 9,
+  "discount": 0.1
+}
+
+> {%
+    client.assert(response.status === 201, "No se ha creado el detalle");
+    client.global.set("last_order_id", response.body["orderId"]);
+    client.global.set("last_product_id", response.body["productId"]);
+    client.log("Detalle creado para Order " + response.body["orderId"] + " y Product " + response.body["productId"]);
+%}
+
+
+### GET Verificación
+GET {{endpoint}}/order/{{last_order_id}}/product/{{last_product_id}}
+Authorization: Bearer {{auth_token}}
+
+
+### PUT (Update)
+PUT {{endpoint}}/order/{{last_order_id}}/product/{{last_product_id}}
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "orderId": {{last_order_id}},
+  "productId": {{last_product_id}},
+  "unitPrice": 20.0,
+  "quantity": 15,
+  "discount": 0.0
+}
+
+
+### DELETE
+DELETE {{endpoint}}/order/{{last_order_id}}/product/{{last_product_id}}
+Authorization: Bearer {{auth_token}}
+
+
+### GET (404/Verificación)
+GET {{endpoint}}/order/{{last_order_id}}/product/{{last_product_id}}
+Authorization: Bearer {{auth_token}}
+
+> {%
+    client.assert(response.status === 404, "El recurso debería haber sido borrado");
+%}

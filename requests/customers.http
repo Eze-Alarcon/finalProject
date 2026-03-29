@@ -1,0 +1,137 @@
+@endpointLogin = {{host}}/auth/login
+@endpoint = {{host}}/customers
+@getOne = ALFKI
+
+### Login Consulta
+POST {{endpointLogin}}
+Content-Type: application/json
+
+{
+  "username": "{{userConsulta}}",
+  "password": "{{pass}}"
+}
+
+> {%
+    client.assert(response.status === 200, "El login falló");
+    let jwt = response.body["token"];
+    client.global.set("auth_token", jwt);
+    client.log("¡Token capturado con éxito!");
+%}
+
+
+### GET All
+GET {{endpoint}}
+Authorization: Bearer {{auth_token}}
+
+
+### GET by ID
+GET {{endpoint}}/{{getOne}}
+Authorization: Bearer {{auth_token}}
+
+
+### POST Fallido (403)
+POST {{endpoint}}
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "customerId": "TEST1",
+  "companyName": "Compañía Prohibida",
+  "contactName": "Contacto Falso",
+  "contactTitle": "Owner",
+  "address": "Calle Falsa 123",
+  "city": "Madrid",
+  "region": null,
+  "postalCode": "28001",
+  "country": "Spain",
+  "phone": "123456789",
+  "fax": null
+}
+
+> {%
+    client.assert(response.status === 403, "No se esperaba que el usuario tuviera permisos");
+%}
+
+
+### Login Autorizado (WAREHOUSE)
+POST {{endpointLogin}}
+Content-Type: application/json
+
+{
+  "username": "{{userWarehouse}}",
+  "password": "{{pass}}"
+}
+
+> {%
+    client.assert(response.status === 200, "El login falló");
+    let jwt = response.body["token"];
+    client.global.set("auth_token", jwt);
+    client.log("¡Token de Warehouse capturado!");
+%}
+
+
+### POST Exitoso (201)
+@newCustomerId = JUNIE
+POST {{endpoint}}
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "customerId": "{{newCustomerId}}",
+  "companyName": "Junie's Company",
+  "contactName": "Junie the Agent",
+  "contactTitle": "Lead Developer",
+  "address": "AI Street 101",
+  "city": "Silicon Valley",
+  "region": "CA",
+  "postalCode": "94025",
+  "country": "USA",
+  "phone": "555-0199",
+  "fax": "555-0198"
+}
+
+> {%
+    client.assert(response.status === 201, "No se ha creado el cliente");
+    let nuevoId = response.body["customerId"];
+    client.global.set("created_customer_id", nuevoId);
+    client.log("Creado con el ID: " + nuevoId);
+%}
+
+
+### GET Verificación
+GET {{endpoint}}/{{created_customer_id}}
+Authorization: Bearer {{auth_token}}
+
+
+### PUT (Update)
+PUT {{endpoint}}/{{created_customer_id}}
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "customerId": "{{created_customer_id}}",
+  "companyName": "Junie's Company Modified",
+  "contactName": "Junie the Agent",
+  "contactTitle": "Lead Architect",
+  "address": "AI Street 101",
+  "city": "Silicon Valley",
+  "region": "CA",
+  "postalCode": "94025",
+  "country": "USA",
+  "phone": "555-0199",
+  "fax": "555-0198"
+}
+
+
+### DELETE
+DELETE {{endpoint}}/{{created_customer_id}}
+Authorization: Bearer {{auth_token}}
+
+
+### GET (404/Verificación)
+GET {{endpoint}}/{{created_customer_id}}
+Authorization: Bearer {{auth_token}}
+
+> {%
+    client.assert(response.status === 404, "El recurso debería haber sido borrado");
+%}

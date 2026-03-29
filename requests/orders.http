@@ -1,0 +1,142 @@
+@endpointLogin = {{host}}/auth/login
+@endpoint = {{host}}/orders
+@getOne = 10248
+
+### Login Consulta
+POST {{endpointLogin}}
+Content-Type: application/json
+
+{
+  "username": "{{userConsulta}}",
+  "password": "{{pass}}"
+}
+
+> {%
+    client.assert(response.status === 200, "El login falló");
+    let jwt = response.body["token"];
+    client.global.set("auth_token", jwt);
+    client.log("¡Token capturado con éxito!");
+%}
+
+
+### GET All
+GET {{endpoint}}
+Authorization: Bearer {{auth_token}}
+
+
+### GET by ID
+GET {{endpoint}}/{{getOne}}
+Authorization: Bearer {{auth_token}}
+
+
+### POST Fallido (403)
+POST {{endpoint}}
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "customerId": "ALFKI",
+  "employeeId": 1,
+  "orderDate": "2023-01-01",
+  "requiredDate": "2023-01-10",
+  "shippedDate": null,
+  "shipperId": 1,
+  "freight": 10.5,
+  "shipName": "Alfred's Futterkiste",
+  "shipAddress": "Obere Str. 57",
+  "shipCity": "Berlin",
+  "shipRegion": null,
+  "shipPostalCode": "12209",
+  "shipCountry": "Germany"
+}
+
+> {%
+    client.assert(response.status === 403, "No se esperaba que el usuario tuviera permisos");
+%}
+
+
+### Login Autorizado (WAREHOUSE)
+POST {{endpointLogin}}
+Content-Type: application/json
+
+{
+  "username": "{{userWarehouse}}",
+  "password": "{{pass}}"
+}
+
+> {%
+    client.assert(response.status === 200, "El login falló");
+    let jwt = response.body["token"];
+    client.global.set("auth_token", jwt);
+    client.log("¡Token de Warehouse capturado!");
+%}
+
+
+### POST Exitoso (201)
+POST {{endpoint}}
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "customerId": "ANATR",
+  "employeeId": 2,
+  "orderDate": "2023-03-29",
+  "requiredDate": "2023-04-29",
+  "shippedDate": null,
+  "shipperId": 2,
+  "freight": 32.38,
+  "shipName": "Ana Trujillo Emparedados y helados",
+  "shipAddress": "Avda. de la Constitución 2222",
+  "shipCity": "México D.F.",
+  "shipRegion": null,
+  "shipPostalCode": "05021",
+  "shipCountry": "Mexico"
+}
+
+> {%
+    client.assert(response.status === 201, "No se ha creado el pedido");
+    let nuevoId = response.body["orderId"];
+    client.global.set("created_order_id", nuevoId);
+    client.log("Creado con el ID: " + nuevoId);
+%}
+
+
+### GET Verificación
+GET {{endpoint}}/{{created_order_id}}
+Authorization: Bearer {{auth_token}}
+
+
+### PUT (Update)
+PUT {{endpoint}}/{{created_order_id}}
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "customerId": "ANATR",
+  "employeeId": 2,
+  "orderDate": "2023-03-29",
+  "requiredDate": "2023-04-29",
+  "shippedDate": "2023-03-30",
+  "shipperId": 3,
+  "freight": 40.0,
+  "shipName": "Ana Trujillo Emparedados y helados MOD",
+  "shipAddress": "Avda. de la Constitución 2222",
+  "shipCity": "México D.F.",
+  "shipRegion": null,
+  "shipPostalCode": "05021",
+  "shipCountry": "Mexico"
+}
+
+
+### DELETE
+DELETE {{endpoint}}/{{created_order_id}}
+Authorization: Bearer {{auth_token}}
+
+
+### GET (404/Verificación)
+GET {{endpoint}}/{{created_order_id}}
+Authorization: Bearer {{auth_token}}
+
+> {%
+    client.assert(response.status === 404, "El recurso debería haber sido borrado");
+%}
