@@ -38,11 +38,12 @@ public class SupplierController {
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
+    @PatchMapping("/{id}")
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'WAREHOUSE')")
     public ResponseEntity<SupplierResponseDTO> update(
             @PathVariable Short id,
-            @Valid @RequestBody SupplierRequestDTO dto) {
+            @RequestBody SupplierRequestDTO dto) {
         return ResponseEntity.ok(supplierService.update(id, dto));
     }
 

@@ -22,5 +22,5 @@ public class ProductResponseDTO {
     private Short unitsInStock;
     private Short unitsOnOrder;
     private Short reorderLevel;
-    private Integer discontinued;
+    // private Integer discontinued;
 }

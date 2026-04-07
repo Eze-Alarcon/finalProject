@@ -62,12 +62,4 @@ public class EmployeeRequestDTO {
 
     @Size(max = 255, message = "Photo path must not exceed 255 characters")
     private String photoPath;
-
-    @Size(max = 50, message = "Username must not exceed 50 characters")
-    private String username;
-
-    @Size(max = 50, message = "Role must not exceed 50 characters")
-    private String role;
-
-    private Boolean activo;
 }

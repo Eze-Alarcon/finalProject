@@ -12,9 +12,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class OrderDetailRequestDTO {
 
-    @NotNull(message = "Order ID is required")
-    private Short orderId;
-
     @NotNull(message = "Product ID is required")
     private Short productId;
 

@@ -9,7 +9,7 @@ public interface EmployeeTerritoryService {
 
     List<EmployeeTerritoryResponseDTO> findAll();
 
-    EmployeeTerritoryResponseDTO findById(Short employeeId, String territoryId);
+    EmployeeTerritoryResponseDTO findByEmployeeId(Short employeeId);
 
     EmployeeTerritoryResponseDTO save(EmployeeTerritoryRequestDTO dto);
 

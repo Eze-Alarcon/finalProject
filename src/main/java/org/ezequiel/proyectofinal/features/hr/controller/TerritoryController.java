@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.ezequiel.proyectofinal.features.hr.dto.TerritoryRequestDTO;
 import org.ezequiel.proyectofinal.features.hr.dto.TerritoryResponseDTO;
+import org.ezequiel.proyectofinal.features.hr.dto.TerritoryUpdateRequestDTO;
 import org.ezequiel.proyectofinal.features.hr.service.TerritoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,7 +43,7 @@ public class TerritoryController {
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
     public ResponseEntity<TerritoryResponseDTO> update(
             @PathVariable String id,
-            @Valid @RequestBody TerritoryRequestDTO dto) {
+            @Valid @RequestBody TerritoryUpdateRequestDTO dto) {
         return ResponseEntity.ok(territoryService.update(id, dto));
     }
 

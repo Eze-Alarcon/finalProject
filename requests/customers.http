@@ -135,3 +135,8 @@ Authorization: Bearer {{auth_token}}
 > {%
     client.assert(response.status === 404, "El recurso debería haber sido borrado");
 %}
+
+
+### Historial de pedidos del cliente
+GET {{endpoint}}/{{getOne}}/orders?page=0&size=10
+Authorization: Bearer {{auth_token}}

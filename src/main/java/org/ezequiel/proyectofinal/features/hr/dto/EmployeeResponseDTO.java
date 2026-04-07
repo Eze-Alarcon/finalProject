@@ -31,7 +31,4 @@ public class EmployeeResponseDTO {
     private Short reportsToId;
     private String reportsToFullName;
     private String photoPath;
-    private String username;
-    private String role;
-    private Boolean activo;
 }

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.ezequiel.proyectofinal.core.exceptions.ResourceNotFoundException;
 import org.ezequiel.proyectofinal.features.hr.dto.TerritoryRequestDTO;
 import org.ezequiel.proyectofinal.features.hr.dto.TerritoryResponseDTO;
+import org.ezequiel.proyectofinal.features.hr.dto.TerritoryUpdateRequestDTO;
 import org.ezequiel.proyectofinal.features.hr.entity.Region;
 import org.ezequiel.proyectofinal.features.hr.entity.Territory;
 import org.ezequiel.proyectofinal.features.hr.mapper.TerritoryMapper;
@@ -50,10 +51,14 @@ public class TerritoryServiceImpl implements TerritoryService {
 
     @Override
     @Transactional
-    public TerritoryResponseDTO update(String id, TerritoryRequestDTO dto) {
+    public TerritoryResponseDTO update(String id, TerritoryUpdateRequestDTO dto) {
         Territory existing = territoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Territory", id));
-        territoryMapper.updateEntityFromDTO(dto, existing);
+        var territory = new TerritoryRequestDTO();
+        territory.setTerritoryId(id);
+        territory.setTerritoryDescription(dto.getTerritoryDescription());
+        territory.setRegionId(dto.getRegionId());
+        territoryMapper.updateEntityFromDTO(territory, existing);
         resolveRegion(existing, dto.getRegionId());
         Territory updated = territoryRepository.save(existing);
         return territoryMapper.toResponseDTO(updated);

@@ -1,0 +1,48 @@
+@endpointLogin = {{host}}/auth/login
+@endpoint = {{host}}/products
+@inventoryEndpoint = {{host}}/inventory
+
+### Login Warehouse
+POST {{endpointLogin}}
+Content-Type: application/json
+
+{
+  "username": "{{userWarehouse}}",
+  "password": "{{pass}}"
+}
+
+> {%
+    client.assert(response.status === 200, "El login falló");
+    let jwt = response.body["token"];
+    client.global.set("auth_token", jwt);
+%}
+
+
+### GET Alertas de Bajo Stock
+GET {{inventoryEndpoint}}/alerts/low-stock
+Authorization: Bearer {{auth_token}}
+
+
+### PATCH Reabastecer Producto
+# Supongamos que el ID 1 existe y necesita reabastecimiento
+PATCH {{endpoint}}/1/restock
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "quantity": 50
+}
+
+
+### PATCH Reabastecer Producto (Error - Cantidad negativa)
+PATCH {{endpoint}}/1/restock
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "quantity": -10
+}
+
+> {%
+    client.assert(response.status === 400 || response.status === 500, "Se esperaba un error");
+%}

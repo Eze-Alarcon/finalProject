@@ -12,8 +12,12 @@ public interface OrderService {
     OrderResponseDTO findById(Short id);
 
     OrderResponseDTO save(OrderRequestDTO dto);
-
+    
     OrderResponseDTO update(Short id, OrderRequestDTO dto);
+
+    OrderResponseDTO shipOrder(Short id);
+
+    OrderResponseDTO cancelOrder(Short id);
 
     void delete(Short id);
 }

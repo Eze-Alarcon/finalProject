@@ -5,6 +5,8 @@ import lombok.*;
 import org.ezequiel.proyectofinal.features.hr.entity.Employee;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "orders", schema = "public")
@@ -60,4 +62,11 @@ public class Order {
 
     @Column(name = "ship_country", length = 15)
     private String shipCountry;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", length = 20, nullable = false)
+    private OrderStatus status = OrderStatus.PENDING;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderDetail> details = new ArrayList<>();
 }

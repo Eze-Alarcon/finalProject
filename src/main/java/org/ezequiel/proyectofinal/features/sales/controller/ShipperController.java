@@ -32,22 +32,23 @@ public class ShipperController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'WAREHOUSE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'WAREHOUSE', 'GESTOR')")
     public ResponseEntity<ShipperResponseDTO> save(@Valid @RequestBody ShipperRequestDTO dto) {
         ShipperResponseDTO created = shipperService.save(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
+    @PatchMapping("/{id}")
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'WAREHOUSE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'WAREHOUSE', 'GESTOR')")
     public ResponseEntity<ShipperResponseDTO> update(
             @PathVariable Short id,
-            @Valid @RequestBody ShipperRequestDTO dto) {
+            @RequestBody ShipperRequestDTO dto) {
         return ResponseEntity.ok(shipperService.update(id, dto));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'WAREHOUSE')")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Short id) {
         shipperService.delete(id);
         return ResponseEntity.noContent().build();

@@ -13,6 +13,7 @@ public class OrderDetailResponseDTO {
 
     private Short orderId;
     private Short productId;
+    private String productName;
     private Float unitPrice;
     private Short quantity;
     private Float discount;

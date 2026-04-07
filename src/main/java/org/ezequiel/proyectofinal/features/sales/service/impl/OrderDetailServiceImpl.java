@@ -48,33 +48,6 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
     @Override
     @Transactional
-    public OrderDetailResponseDTO save(OrderDetailRequestDTO dto) {
-        Order order = orderRepository.findById(dto.getOrderId())
-                .orElseThrow(() -> new ResourceNotFoundException("Order", dto.getOrderId()));
-        Product product = productRepository.findById(dto.getProductId())
-                .orElseThrow(() -> new ResourceNotFoundException("Product", dto.getProductId()));
-
-        OrderDetailId id = new OrderDetailId(dto.getOrderId(), dto.getProductId());
-        OrderDetail orderDetail = new OrderDetail(id, order, product, dto.getUnitPrice(), dto.getQuantity(), dto.getDiscount());
-        OrderDetail saved = orderDetailRepository.save(orderDetail);
-        return orderDetailMapper.toResponseDTO(saved);
-    }
-
-    @Override
-    @Transactional
-    public OrderDetailResponseDTO update(Short orderId, Short productId, OrderDetailRequestDTO dto) {
-        OrderDetailId id = new OrderDetailId(orderId, productId);
-        OrderDetail existing = orderDetailRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        String.format("OrderDetail with orderId '%s' and productId '%s' not found",
-                                orderId, productId)));
-        orderDetailMapper.updateEntityFromDTO(dto, existing);
-        OrderDetail updated = orderDetailRepository.save(existing);
-        return orderDetailMapper.toResponseDTO(updated);
-    }
-
-    @Override
-    @Transactional
     public void delete(Short orderId, Short productId) {
         OrderDetailId id = new OrderDetailId(orderId, productId);
         if (!orderDetailRepository.existsById(id)) {

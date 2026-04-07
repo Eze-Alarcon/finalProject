@@ -32,20 +32,31 @@ public class OrderController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'WAREHOUSE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'WAREHOUSE', 'GESTOR')")
     public ResponseEntity<OrderResponseDTO> save(@Valid @RequestBody OrderRequestDTO dto) {
         OrderResponseDTO created = orderService.save(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'WAREHOUSE')")
-    public ResponseEntity<OrderResponseDTO> update(
-            @PathVariable Short id,
-            @Valid @RequestBody OrderRequestDTO dto) {
+    @PatchMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'WAREHOUSE', 'GESTOR')")
+    public ResponseEntity<OrderResponseDTO> update(@PathVariable Short id, @RequestBody OrderRequestDTO dto) {
         return ResponseEntity.ok(orderService.update(id, dto));
     }
 
+    @PatchMapping("/{id}/ship")
+    @PreAuthorize("hasAnyRole('ADMIN', 'WAREHOUSE')")
+    public ResponseEntity<OrderResponseDTO> shipOrder(@PathVariable Short id) {
+        return ResponseEntity.ok(orderService.shipOrder(id));
+    }
+
+    @PatchMapping("/{id}/cancel")
+    @PreAuthorize("hasAnyRole('ADMIN', 'WAREHOUSE', 'GESTOR')")
+    public ResponseEntity<OrderResponseDTO> cancelOrder(@PathVariable Short id) {
+        return ResponseEntity.ok(orderService.cancelOrder(id));
+    }
+
+    @Deprecated
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'WAREHOUSE')")
     public ResponseEntity<Void> delete(@PathVariable Short id) {

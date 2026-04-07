@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
@@ -27,4 +28,6 @@ public class OrderResponseDTO {
     private String shipRegion;
     private String shipPostalCode;
     private String shipCountry;
+    private String status;
+    private List<OrderDetailResponseDTO> details;
 }

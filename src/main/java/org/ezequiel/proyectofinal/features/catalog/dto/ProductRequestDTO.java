@@ -1,7 +1,6 @@
 package org.ezequiel.proyectofinal.features.catalog.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,12 +26,7 @@ public class ProductRequestDTO {
 
     private Float unitPrice;
 
-    private Short unitsInStock;
+    private Short unitsInStock = 0;
 
-    private Short unitsOnOrder;
-
-    private Short reorderLevel;
-
-    @NotNull(message = "Discontinued flag is required")
-    private Integer discontinued;
+    private Short reorderLevel = 0;
 }

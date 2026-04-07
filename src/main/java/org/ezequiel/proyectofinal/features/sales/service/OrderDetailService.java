@@ -11,9 +11,5 @@ public interface OrderDetailService {
 
     OrderDetailResponseDTO findById(Short orderId, Short productId);
 
-    OrderDetailResponseDTO save(OrderDetailRequestDTO dto);
-
-    OrderDetailResponseDTO update(Short orderId, Short productId, OrderDetailRequestDTO dto);
-
     void delete(Short orderId, Short productId);
 }

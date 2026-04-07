@@ -25,12 +25,11 @@ public class EmployeeTerritoryController {
         return ResponseEntity.ok(employeeTerritoryService.findAll());
     }
 
-    @GetMapping("/employee/{employeeId}/territory/{territoryId}")
+    @GetMapping("/employee/{employeeId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR', 'CONSULTA')")
-    public ResponseEntity<EmployeeTerritoryResponseDTO> findById(
-            @PathVariable Short employeeId,
-            @PathVariable String territoryId) {
-        return ResponseEntity.ok(employeeTerritoryService.findById(employeeId, territoryId));
+    public ResponseEntity<EmployeeTerritoryResponseDTO> findByEmployeeId(
+            @PathVariable Short employeeId) {
+        return ResponseEntity.ok(employeeTerritoryService.findByEmployeeId(employeeId));
     }
 
     @PostMapping

@@ -30,15 +30,16 @@ public class EmployeeTerritoryServiceImpl implements EmployeeTerritoryService {
 
     @Override
     public List<EmployeeTerritoryResponseDTO> findAll() {
-        return employeeTerritoryRepository.findAllProjected();
+        return employeeTerritoryRepository.findAllProjected().stream()
+                .map(employeeTerritoryMapper::toResponseDTO)
+                .toList();
     }
 
     @Override
-    public EmployeeTerritoryResponseDTO findById(Short employeeId, String territoryId) {
-        return employeeTerritoryRepository.findByIdProjected(employeeId, territoryId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        String.format("EmployeeTerritory with employeeId '%s' and territoryId '%s' not found",
-                                employeeId, territoryId)));
+    public EmployeeTerritoryResponseDTO findByEmployeeId(Short employeeId) {
+        return employeeTerritoryRepository.findByEmployeeIdProjected(employeeId)
+                .map(employeeTerritoryMapper::toResponseDTO)
+                .orElseThrow(() -> new ResourceNotFoundException("EmployeeTerritory details for employee", employeeId));
     }
 
     @Override

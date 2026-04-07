@@ -17,9 +17,9 @@ public interface OrderDetailMapper {
 
     @Mapping(target = "orderId", source = "order.orderId")
     @Mapping(target = "productId", source = "product.productId")
+    @Mapping(target = "productName", source = "product.productName")
     OrderDetailResponseDTO toResponseDTO(OrderDetail entity);
 
-    @Mapping(target = "orderId", source = "id.orderId")
     @Mapping(target = "productId", source = "id.productId")
     OrderDetailRequestDTO toRequestDTO(OrderDetail entity);
 

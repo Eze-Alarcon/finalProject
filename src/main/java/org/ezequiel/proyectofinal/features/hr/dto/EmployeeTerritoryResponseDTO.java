@@ -13,6 +13,5 @@ public class EmployeeTerritoryResponseDTO {
 
     private Short employeeId;
     private String employeeFullName;
-    private String territoryId;
-    private String territoryDescription;
+    private String territories;
 }

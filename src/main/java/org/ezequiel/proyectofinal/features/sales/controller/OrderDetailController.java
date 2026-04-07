@@ -33,23 +33,7 @@ public class OrderDetailController {
         return ResponseEntity.ok(orderDetailService.findById(orderId, productId));
     }
 
-    @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'WAREHOUSE')")
-    public ResponseEntity<OrderDetailResponseDTO> save(
-            @Valid @RequestBody OrderDetailRequestDTO dto) {
-        OrderDetailResponseDTO created = orderDetailService.save(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
-    }
-
-    @PutMapping("/order/{orderId}/product/{productId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'WAREHOUSE')")
-    public ResponseEntity<OrderDetailResponseDTO> update(
-            @PathVariable Short orderId,
-            @PathVariable Short productId,
-            @Valid @RequestBody OrderDetailRequestDTO dto) {
-        return ResponseEntity.ok(orderDetailService.update(orderId, productId, dto));
-    }
-
+    @Deprecated
     @DeleteMapping("/order/{orderId}/product/{productId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'WAREHOUSE')")
     public ResponseEntity<Void> delete(

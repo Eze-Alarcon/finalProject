@@ -128,3 +128,28 @@ Authorization: Bearer {{auth_token}}
 > {%
     client.assert(response.status === 404, "El recurso debería haber sido borrado");
 %}
+
+
+### DISCONTINUE Product
+PATCH {{endpoint}}/{{getOne}}/discontinue
+Authorization: Bearer {{auth_token}}
+
+> {%
+    client.assert(response.status === 200, "No se ha podido descontinuar el producto");
+    client.assert(response.body["discontinued"] === 1, "El estado no es descontinuado");
+%}
+
+
+### SEARCH - Only Category
+GET {{endpoint}}/search?categoryId=1&page=0&size=5
+Authorization: Bearer {{auth_token}}
+
+
+### SEARCH - Price Range
+GET {{endpoint}}/search?minPrice=10&maxPrice=20&page=0&size=10
+Authorization: Bearer {{auth_token}}
+
+
+### SEARCH - Full Filters
+GET {{endpoint}}/search?categoryId=1&supplierId=1&minPrice=10&maxPrice=50&inStock=true&page=0&size=10
+Authorization: Bearer {{auth_token}}

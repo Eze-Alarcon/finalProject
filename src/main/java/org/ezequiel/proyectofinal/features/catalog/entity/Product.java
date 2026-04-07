@@ -2,6 +2,7 @@ package org.ezequiel.proyectofinal.features.catalog.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 
 @Entity
 @Table(name = "products", schema = "public")
@@ -37,11 +38,11 @@ public class Product {
     private Short unitsInStock;
 
     @Column(name = "units_on_order")
-    private Short unitsOnOrder;
+    private Short unitsOnOrder = 0;
 
     @Column(name = "reorder_level")
-    private Short reorderLevel;
+    private Short reorderLevel = 0;
 
     @Column(name = "discontinued", nullable = false)
-    private Integer discontinued;
+    private Integer discontinued = 0;
 }

@@ -38,11 +38,12 @@ public class EmployeeController {
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
+    @PatchMapping("/{id}")
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
     public ResponseEntity<EmployeeResponseDTO> update(
             @PathVariable Short id,
-            @Valid @RequestBody EmployeeRequestDTO dto) {
+            @RequestBody EmployeeRequestDTO dto) {
         return ResponseEntity.ok(employeeService.update(id, dto));
     }
 

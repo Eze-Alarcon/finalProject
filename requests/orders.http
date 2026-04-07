@@ -47,7 +47,15 @@ Authorization: Bearer {{auth_token}}
   "shipCity": "Berlin",
   "shipRegion": null,
   "shipPostalCode": "12209",
-  "shipCountry": "Germany"
+  "shipCountry": "Germany",
+  "details": [
+    {
+      "productId": 1,
+      "unitPrice": 18.0,
+      "quantity": 5,
+      "discount": 0.0
+    }
+  ]
 }
 
 > {%
@@ -90,7 +98,21 @@ Authorization: Bearer {{auth_token}}
   "shipCity": "México D.F.",
   "shipRegion": null,
   "shipPostalCode": "05021",
-  "shipCountry": "Mexico"
+  "shipCountry": "Mexico",
+  "details": [
+    {
+      "productId": 2,
+      "unitPrice": 19.0,
+      "quantity": 1,
+      "discount": 0.0
+    },
+    {
+      "productId": 3,
+      "unitPrice": 10.0,
+      "quantity": 1,
+      "discount": 0.1
+    }
+  ]
 }
 
 > {%
@@ -106,8 +128,18 @@ GET {{endpoint}}/{{created_order_id}}
 Authorization: Bearer {{auth_token}}
 
 
-### PUT (Update)
-PUT {{endpoint}}/{{created_order_id}}
+### SHIP Order
+PATCH {{endpoint}}/{{created_order_id}}/ship
+Authorization: Bearer {{auth_token}}
+
+> {%
+    client.assert(response.status === 200, "No se ha podido enviar el pedido");
+    client.assert(response.body["status"] === "SHIPPED", "El estado no es SHIPPED");
+%}
+
+
+### CANCEL Order (Primero crear uno nuevo para cancelar)
+POST {{endpoint}}
 Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
@@ -115,17 +147,28 @@ Authorization: Bearer {{auth_token}}
   "customerId": "ANATR",
   "employeeId": 2,
   "orderDate": "2023-03-29",
-  "requiredDate": "2023-04-29",
-  "shippedDate": "2023-03-30",
-  "shipperId": 3,
-  "freight": 40.0,
-  "shipName": "Ana Trujillo Emparedados y helados MOD",
-  "shipAddress": "Avda. de la Constitución 2222",
-  "shipCity": "México D.F.",
-  "shipRegion": null,
-  "shipPostalCode": "05021",
-  "shipCountry": "Mexico"
+  "details": [
+    {
+      "productId": 2,
+      "unitPrice": 19.0,
+      "quantity": 1,
+      "discount": 0.0
+    }
+  ]
 }
+
+> {%
+    client.global.set("order_to_cancel", response.body["orderId"]);
+%}
+
+### CANCEL EXECUTION
+PATCH {{endpoint}}/{{order_to_cancel}}/cancel
+Authorization: Bearer {{auth_token}}
+
+> {%
+    client.assert(response.status === 200, "No se ha podido cancelar el pedido");
+    client.assert(response.body["status"] === "CANCELLED", "El estado no es CANCELLED");
+%}
 
 
 ### DELETE
