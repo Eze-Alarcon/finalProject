@@ -1,155 +1,55 @@
-@endpointLogin = {{host}}/auth/login
-@endpoint = {{host}}/products
-@getOne = 1
-
-### Login Consulta
-POST {{endpointLogin}}
-Content-Type: application/json
-
-{
-  "username": "{{userConsulta}}",
-  "password": "{{pass}}"
-}
-
-> {%
-    client.assert(response.status === 200, "El login falló");
-    let jwt = response.body["token"];
-    client.global.set("auth_token", jwt);
-    client.log("¡Token capturado con éxito!");
-%}
-
-
-### GET All
-GET {{endpoint}}
+### Obtener todos los productos (con paginación y búsqueda)
+# Este endpoint es el principal para búsqueda avanzada
+GET {{host}}/api/v1/products?categoryId=1&inStock=true&page=0&size=10
 Authorization: Bearer {{auth_token}}
 
-
-### GET by ID
-GET {{endpoint}}/{{getOne}}
+### Búsqueda avanzada combinando más filtros
+GET {{host}}/api/v1/products?supplierId=1&minPrice=10&maxPrice=100&page=0&size=20
 Authorization: Bearer {{auth_token}}
 
+### Obtener un producto por ID
+GET {{host}}/api/v1/products/1
+Authorization: Bearer {{auth_token}}
 
-### POST Fallido (403)
-POST {{endpoint}}
+### Crear un nuevo producto
+POST {{host}}/api/v1/products
 Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
 {
-  "productName": "Producto Prohibido",
+  "productName": "Laptop Gaming X1",
   "supplierId": 1,
-  "categoryId": 1,
-  "quantityPerUnit": "10 boxes",
-  "unitPrice": 18.0,
-  "unitsInStock": 39,
-  "unitsOnOrder": 0,
-  "reorderLevel": 10,
-  "discontinued": 0
+  "categoryId": 2,
+  "quantityPerUnit": "1 unit",
+  "unitPrice": 1200.50,
+  "unitsInStock": 50,
+  "reorderLevel": 10
 }
 
-> {%
-    client.assert(response.status === 403, "No se esperaba que el usuario tuviera permisos");
-%}
-
-
-### Login Autorizado (WAREHOUSE)
-POST {{endpointLogin}}
-Content-Type: application/json
-
-{
-  "username": "{{userWarehouse}}",
-  "password": "{{pass}}"
-}
-
-> {%
-    client.assert(response.status === 200, "El login falló");
-    let jwt = response.body["token"];
-    client.global.set("auth_token", jwt);
-    client.log("¡Token de Warehouse capturado!");
-%}
-
-
-### POST Exitoso (201)
-POST {{endpoint}}
+### Actualización Parcial (PATCH/PUT) - Solo 2 campos
+# Verificamos que no se sobreescriban los demás campos con null
+PATCH {{host}}/api/v1/products/1
 Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
 {
-  "productName": "Nuevo Producto",
-  "supplierId": 1,
-  "categoryId": 1,
-  "quantityPerUnit": "24 - 12 oz bottles",
-  "unitPrice": 19.0,
-  "unitsInStock": 17,
-  "unitsOnOrder": 40,
-  "reorderLevel": 25,
-  "discontinued": 0
+  "unitPrice": 1250.00,
+  "unitsInStock": 45
 }
 
-> {%
-    client.assert(response.status === 201, "No se ha creado el producto");
-    let nuevoId = response.body["productId"];
-    client.global.set("created_product_id", nuevoId);
-    client.log("Creado con el ID: " + nuevoId);
-%}
-
-
-### GET Verificación
-GET {{endpoint}}/{{created_product_id}}
-Authorization: Bearer {{auth_token}}
-
-
-### PUT (Update)
-PUT {{endpoint}}/{{created_product_id}}
+### Reponer stock (Restock)
+PATCH {{host}}/api/v1/products/1/restock
 Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
 {
-  "productName": "Producto Actualizado",
-  "supplierId": 1,
-  "categoryId": 1,
-  "quantityPerUnit": "24 - 12 oz bottles",
-  "unitPrice": 21.5,
-  "unitsInStock": 15,
-  "unitsOnOrder": 30,
-  "reorderLevel": 25,
-  "discontinued": 0
+  "quantity": 20
 }
 
-
-### DELETE
-DELETE {{endpoint}}/{{created_product_id}}
+### Marcar producto como descontinuado
+PATCH {{host}}/api/v1/products/1/discontinue
 Authorization: Bearer {{auth_token}}
 
-
-### GET (404/Verificación)
-GET {{endpoint}}/{{created_product_id}}
-Authorization: Bearer {{auth_token}}
-
-> {%
-    client.assert(response.status === 404, "El recurso debería haber sido borrado");
-%}
-
-
-### DISCONTINUE Product
-PATCH {{endpoint}}/{{getOne}}/discontinue
-Authorization: Bearer {{auth_token}}
-
-> {%
-    client.assert(response.status === 200, "No se ha podido descontinuar el producto");
-    client.assert(response.body["discontinued"] === 1, "El estado no es descontinuado");
-%}
-
-
-### SEARCH - Only Category
-GET {{endpoint}}/search?categoryId=1&page=0&size=5
-Authorization: Bearer {{auth_token}}
-
-
-### SEARCH - Price Range
-GET {{endpoint}}/search?minPrice=10&maxPrice=20&page=0&size=10
-Authorization: Bearer {{auth_token}}
-
-
-### SEARCH - Full Filters
-GET {{endpoint}}/search?categoryId=1&supplierId=1&minPrice=10&maxPrice=50&inStock=true&page=0&size=10
+### Eliminar un producto
+DELETE {{host}}/api/v1/products/1
 Authorization: Bearer {{auth_token}}

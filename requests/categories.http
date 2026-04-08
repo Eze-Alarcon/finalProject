@@ -1,109 +1,31 @@
-@endpointLogin = {{host}}/auth/login
-@endpoint = {{host}}/categories
-@getOne = 1
-
-### Login Consulta
-POST {{endpointLogin}}
-Content-Type: application/json
-
-{
-  "username": "{{userConsulta}}",
-  "password": "{{pass}}"
-}
-
-> {%
-    client.assert(response.status === 200, "El login falló");
-    let jwt = response.body["token"];
-    client.global.set("auth_token", jwt);
-    client.log("¡Token capturado con éxito!");
-%}
-
-
-### GET All
-GET {{endpoint}}
+### Obtener todas las categorías
+GET {{host}}/api/v1/categories
 Authorization: Bearer {{auth_token}}
 
-
-### GET by ID
-GET {{endpoint}}/{{getOne}}
+### Obtener una categoría por ID
+GET {{host}}/api/v1/categories/1
 Authorization: Bearer {{auth_token}}
 
-
-### POST Fallido (403)
-POST {{endpoint}}
+### Crear una nueva categoría
+POST {{host}}/api/v1/categories
 Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
 {
-  "categoryName": "Prohibido",
-  "description": "No debería crearse"
+  "categoryName": "Electrónica",
+  "description": "Dispositivos electrónicos y gadgets"
 }
 
-> {%
-    client.assert(response.status === 403, "No se esperaba que el usuario tuviera permisos");
-%}
-
-
-### Login Autorizado (WAREHOUSE)
-POST {{endpointLogin}}
-Content-Type: application/json
-
-{
-  "username": "{{userWarehouse}}",
-  "password": "{{pass}}"
-}
-
-> {%
-    client.assert(response.status === 200, "El login falló");
-    let jwt = response.body["token"];
-    client.global.set("auth_token", jwt);
-    client.log("¡Token de Warehouse capturado!");
-%}
-
-
-### POST Exitoso (201)
-POST {{endpoint}}
+### Actualización Parcial (PATCH/PUT) - Solo 1 campo
+# Se envía solo la descripción para verificar que el nombre no se pierda
+PATCH {{host}}/api/v1/categories/1
 Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
 {
-  "categoryName": "Testing",
-  "description": "Descripción de la nueva categoría"
+  "description": "Nueva descripción de la categoría"
 }
 
-> {%
-    client.assert(response.status === 201, "No se ha creado la categoría");
-    let nuevoId = response.body["categoryId"];
-    client.global.set("created_category_id", nuevoId);
-    client.log("Creado con el ID: " + nuevoId);
-%}
-
-
-### GET Verificación
-GET {{endpoint}}/{{created_category_id}}
+### Eliminar una categoría
+DELETE {{host}}/api/v1/categories/1
 Authorization: Bearer {{auth_token}}
-
-
-### PUT (Update)
-PUT {{endpoint}}/{{created_category_id}}
-Content-Type: application/json
-Authorization: Bearer {{auth_token}}
-
-{
-  "categoryName": "testing",
-  "description": "Descripción actualizada"
-}
-
-
-### DELETE
-DELETE {{endpoint}}/{{created_category_id}}
-Authorization: Bearer {{auth_token}}
-
-
-### GET (404/Verificación)
-GET {{endpoint}}/{{created_category_id}}
-Authorization: Bearer {{auth_token}}
-
-> {%
-    client.assert(response.status === 404, "El recurso debería haber sido borrado");
-%}

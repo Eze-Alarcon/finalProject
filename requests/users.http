@@ -1,18 +1,5 @@
-### Login como ADMIN
-POST {{host}}/auth/login
-Content-Type: application/json
-
-{
-  "username": "{{userAdmin}}",
-  "password": "{{pass}}"
-}
-
-> {%
-    client.global.set("auth_token", response.body.token);
-%}
-
 ### Crear un nuevo usuario (Solo ADMIN)
-POST {{host}}/users
+POST {{host}}/api/v1/users
 Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
@@ -23,15 +10,32 @@ Authorization: Bearer {{auth_token}}
   "employeeId": 1
 }
 
-### Listar todos los usuarios
-GET {{host}}/users
+### Cambiar contraseña de un usuario
+PATCH {{host}}/api/v1/users/1/password
+Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
-### Habilitar/Deshabilitar usuario
-PATCH {{host}}/users/1/status
+{
+  "oldPassword": "password123",
+  "newPassword": "newPassword456"
+}
+
+### Cambiar el rol de un usuario (Solo ADMIN)
+PATCH {{host}}/api/v1/users/1/role
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "role": "ROLE_ADMIN"
+}
+
+### Habilitar/Deshabilitar usuario (Solo ADMIN)
+PATCH {{host}}/api/v1/users/1/status
 Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
 false
 
-### NOTA: Asegúrate de inyectar el token JWT en la cabecera Authorization: Bearer <token>
+### Listar todos los usuarios (Solo ADMIN)
+GET {{host}}/api/v1/users
+Authorization: Bearer {{auth_token}}

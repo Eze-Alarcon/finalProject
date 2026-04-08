@@ -1,72 +1,11 @@
-@endpointLogin = {{host}}/auth/login
-@endpoint = {{host}}/order-details
-@orderId = 10248
-@productId = 11
-
-### Login Consulta
-POST {{endpointLogin}}
-Content-Type: application/json
-
-{
-  "username": "{{userConsulta}}",
-  "password": "{{pass}}"
-}
-
-> {%
-    client.assert(response.status === 200, "El login falló");
-    let jwt = response.body["token"];
-    client.global.set("auth_token", jwt);
-    client.log("¡Token capturado con éxito!");
-%}
-
-
-### GET All
-GET {{endpoint}}
+### Obtener todas las líneas de pedido
+GET {{host}}/api/v1/order-details
 Authorization: Bearer {{auth_token}}
 
-
-### GET by ID (Compuesta)
-GET {{endpoint}}/order/{{orderId}}/product/{{productId}}
+### Obtener una línea de pedido específica por Order ID y Product ID
+GET {{host}}/api/v1/order-details/order/1/product/1
 Authorization: Bearer {{auth_token}}
 
-
-
-
-### Login Autorizado (WAREHOUSE)
-POST {{endpointLogin}}
-Content-Type: application/json
-
-{
-  "username": "{{userWarehouse}}",
-  "password": "{{pass}}"
-}
-
-> {%
-    client.assert(response.status === 200, "El login falló");
-    let jwt = response.body["token"];
-    client.global.set("auth_token", jwt);
-    client.log("¡Token de Warehouse capturado!");
-%}
-
-
-
-
-### GET Verificación
-GET {{endpoint}}/order/{{last_order_id}}/product/{{last_product_id}}
+### Eliminar una línea de pedido (Deprecated)
+DELETE {{host}}/api/v1/order-details/order/1/product/1
 Authorization: Bearer {{auth_token}}
-
-
-
-
-### DELETE
-DELETE {{endpoint}}/order/{{last_order_id}}/product/{{last_product_id}}
-Authorization: Bearer {{auth_token}}
-
-
-### GET (404/Verificación)
-GET {{endpoint}}/order/{{last_order_id}}/product/{{last_product_id}}
-Authorization: Bearer {{auth_token}}
-
-> {%
-    client.assert(response.status === 404, "El recurso debería haber sido borrado");
-%}

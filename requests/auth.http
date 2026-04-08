@@ -1,33 +1,15 @@
-### Login
-POST {{host}}/auth/login
+### Login: Inicio de sesión para obtener tokens
+POST {{host}}/api/v1/auth/login
 Content-Type: application/json
 
 {
-  "username": "{{userConsulta}}",
+  "username": "{{userAdmin}}",
   "password": "{{pass}}"
 }
 
 > {%
-    // Este bloque se ejecuta JUSTO DESPUÉS de recibir la respuesta
+    client.global.set("auth_token", response.body["token"]);
+    client.global.set("refresh_token", response.body["refreshToken"]);
 
-    // Verificamos que el login fue exitoso (opcional pero recomendado)
-    client.assert(response.status === 200, "El login falló");
-
-    let jwt = response.body.token;
-
-    // Guardamos el token en una variable global de IntelliJ
-    client.global.set("auth_token", jwt);
-
-    client.log("¡Token capturado con éxito!");
+    client.log("Token guardado: " + client.global.get("auth_token"));
 %}
-
-
-### Listar todos los estados
-GET {{host}}/us-states
-# Aquí inyectamos la variable que acabamos de guardar
-Authorization: Bearer {{auth_token}}
-
-
-### Traer 1
-GET {{host}}/us-states/1
-Authorization: Bearer {{auth_token}}

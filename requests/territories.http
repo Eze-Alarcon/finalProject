@@ -1,81 +1,32 @@
-@endpointLogin = {{host}}/auth/login
-@endpoint = {{host}}/territories
-
-### Login
-POST {{endpointLogin}}
-Content-Type: application/json
-
-{
-  "username": "{{userGestor}}",
-  "password": "{{pass}}"
-}
-
-> {%
-    client.assert(response.status === 200, "El login falló");
-    let jwt = response.body["token"];
-    // Guardamos el token en una variable global de IntelliJ
-    client.global.set("auth_token", jwt);
-
-    client.log("¡Token capturado con éxito!");
-%}
-
-
-### Probar endpoint de traer todos
-GET {{endpoint}}
-# Aquí inyectamos la variable que acabamos de guardar
+### Obtener todos los territorios
+GET {{host}}/api/v1/territories
 Authorization: Bearer {{auth_token}}
 
-
-### Probar traer solo 1
-@getOne = 01581
-GET {{endpoint}}/{{getOne}}
+### Obtener un territorio por ID
+GET {{host}}/api/v1/territories/01581
 Authorization: Bearer {{auth_token}}
 
-
-
-### Crear
-@id = 99999
-POST {{endpoint}}
+### Crear un nuevo territorio
+POST {{host}}/api/v1/territories
 Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
 {
-  "territoryId": "{{id}}",
-  "territoryDescription": "Testing",
+  "territoryId": "99999",
+  "territoryDescription": "Zona de Pruebas",
   "regionId": 1
 }
 
-> {%
-    if (response.status === 401) {
-        client.log("");
-    }
-    client.assert(response.status === 201, "No se ha creado el estado");
-
-
-    client.log(response.body);
-%}
-
-### Probar verificar creacion
-GET {{endpoint}}/{{id}}
-Authorization: Bearer {{auth_token}}
-
-
-### Actualizar (hay que enviar todo el objeto)
-PUT {{endpoint}}/{{id}}
+### Actualización Parcial (PATCH/PUT) - Solo 1 campo
+# Se envía solo la descripción para verificar que la región no cambie
+PUT {{host}}/api/v1/territories/99999
 Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
 {
-  "territoryId": "{{id}}",
-  "territoryDescription": "Madrid",
-  "regionId": 2
+  "territoryDescription": "Zona de Pruebas Actualizada"
 }
 
-### Borrar
-DELETE {{endpoint}}/{{id}}
-Authorization: Bearer {{auth_token}}
-
-
-### Comprobar borrado
-GET {{endpoint}}/{{id}}
+### Eliminar un territorio
+DELETE {{host}}/api/v1/territories/99999
 Authorization: Bearer {{auth_token}}

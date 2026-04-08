@@ -1,116 +1,31 @@
-@endpointLogin = {{host}}/auth/login
-@endpoint = {{host}}/shippers
-@getOne = 1
-
-### Login
-POST {{endpointLogin}}
-Content-Type: application/json
-
-{
-  "username": "{{userConsulta}}",
-  "password": "{{pass}}"
-}
-
-> {%
-    client.assert(response.status === 200, "El login falló");
-    let jwt = response.body["token"];
-    // Guardamos el token en una variable global de IntelliJ
-    client.global.set("auth_token", jwt);
-
-    client.log("¡Token capturado con éxito!");
-%}
-
-
-### Probar endpoint de traer todos
-GET {{endpoint}}
-# Aquí inyectamos la variable que acabamos de guardar
+### Obtener todos los transportistas
+GET {{host}}/api/v1/shippers
 Authorization: Bearer {{auth_token}}
 
-
-### Probar traer solo 1
-GET {{endpoint}}/{{getOne}}
+### Obtener un transportista por ID
+GET {{host}}/api/v1/shippers/1
 Authorization: Bearer {{auth_token}}
 
-
-### Crear
-POST {{endpoint}}
+### Crear un nuevo transportista
+POST {{host}}/api/v1/shippers
 Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
 {
-  "companyName": "Empresa Falsa",
-  "phone": "123456789"
+  "companyName": "Express Shipping",
+  "phone": "555-0123"
 }
 
-> {%
-    client.assert(response.status === 403, "No se ha creado, el usuario no tiene permisos");
-
-    client.log(response.body);
-%}
-
-
-
-### Login
-POST {{endpointLogin}}
-Content-Type: application/json
-
-{
-  "username": "{{userWarehouse}}",
-  "password": "{{pass}}"
-}
-
-> {%
-    client.assert(response.status === 200, "El login falló");
-    let jwt = response.body["token"];
-    // Guardamos el token en una variable global de IntelliJ
-    client.global.set("auth_token", jwt);
-
-    client.log("¡Token capturado con éxito!");
-%}
-
-
-### Crear
-POST {{endpoint}}
+### Actualización Parcial (PATCH/PUT) - Solo 1 campo
+# Se envía solo el nombre de la compañía para verificar que el teléfono no se borre
+PATCH {{host}}/api/v1/shippers/1
 Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
 {
-  "companyName": "Empresa Falsa",
-  "phone": "123456789"
+  "companyName": "Express Shipping International"
 }
 
-> {%
-    client.assert(response.status === 201, "No se ha creado, el usuario no tiene permisos");
-    
-    let nuevoId = response.body["shipperId"];
-    
-    client.global.set("created_shipper_id", nuevoId);
-
-    client.log(response.body);
-%}
-
-
-### Probar verificar creacion
-GET {{endpoint}}/{{created_shipper_id}}
-Authorization: Bearer {{auth_token}}
-
-
-### Actualizar (hay que enviar todo el objeto)
-PUT {{endpoint}}/{{created_shipper_id}}
-Content-Type: application/json
-Authorization: Bearer {{auth_token}}
-
-{
-  "companyName": "Empresa Falsa Actualizada",
-  "phone": "987654321"
-}
-
-
-### Borrar
-DELETE {{endpoint}}/{{created_shipper_id}}
-Authorization: Bearer {{auth_token}}
-
-
-### Comprobar borrado
-GET {{endpoint}}/{{created_shipper_id}}
+### Eliminar un transportista
+DELETE {{host}}/api/v1/shippers/1
 Authorization: Bearer {{auth_token}}

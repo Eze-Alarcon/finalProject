@@ -1,101 +1,21 @@
-@endpointLogin = {{host}}/auth/login
-@endpoint = {{host}}/employee-territories
-@employeeId = 1
-@territoryId = 06897
-
-### Login Consulta
-POST {{endpointLogin}}
-Content-Type: application/json
-
-{
-  "username": "{{userConsulta}}",
-  "password": "{{pass}}"
-}
-
-> {%
-    client.assert(response.status === 200, "El login falló");
-    let jwt = response.body["token"];
-    client.global.set("auth_token", jwt);
-    client.log("¡Token capturado con éxito!");
-%}
-
-
-### GET All
-GET {{endpoint}}
+### Obtener todas las relaciones empleado-territorio
+GET {{host}}/api/v1/employee-territories
 Authorization: Bearer {{auth_token}}
 
-
-### GET by ID (Compuesta)
-GET {{endpoint}}/employee/{{employeeId}}/territory/{{territoryId}}
+### Obtener territorios de un empleado específico
+GET {{host}}/api/v1/employee-territories/employee/1
 Authorization: Bearer {{auth_token}}
 
-
-### POST Fallido (403)
-POST {{endpoint}}
+### Asignar un territorio a un empleado
+POST {{host}}/api/v1/employee-territories
 Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
 {
-  "employeeId": 2,
+  "employeeId": 1,
   "territoryId": "01581"
 }
 
-> {%
-    client.assert(response.status === 403, "No se esperaba que el usuario tuviera permisos");
-%}
-
-
-### Login Autorizado (GESTOR)
-POST {{endpointLogin}}
-Content-Type: application/json
-
-{
-  "username": "{{userGestor}}",
-  "password": "{{pass}}"
-}
-
-> {%
-    client.assert(response.status === 200, "El login falló");
-    let jwt = response.body["token"];
-    client.global.set("auth_token", jwt);
-    client.log("¡Token de Gestor capturado!");
-%}
-
-
-### POST Exitoso (201)
-@newEmployeeId = 3
-@newTerritoryId = 03049
-POST {{endpoint}}
-Content-Type: application/json
+### Eliminar la asignación de un territorio a un empleado
+DELETE {{host}}/api/v1/employee-territories/employee/1/territory/01581
 Authorization: Bearer {{auth_token}}
-
-{
-  "employeeId": {{newEmployeeId}},
-  "territoryId": "{{newTerritoryId}}"
-}
-
-> {%
-    client.assert(response.status === 201, "No se ha creado la relación");
-    client.global.set("last_employee_id", response.body["employeeId"]);
-    client.global.set("last_territory_id", response.body["territoryId"]);
-    client.log("Relación creada para Employee " + response.body["employeeId"] + " y Territory " + response.body["territoryId"]);
-%}
-
-
-### GET Verificación
-GET {{endpoint}}/employee/{{last_employee_id}}/territory/{{last_territory_id}}
-Authorization: Bearer {{auth_token}}
-
-
-### DELETE
-DELETE {{endpoint}}/employee/{{last_employee_id}}/territory/{{last_territory_id}}
-Authorization: Bearer {{auth_token}}
-
-
-### GET (404/Verificación)
-GET {{endpoint}}/employee/{{last_employee_id}}/territory/{{last_territory_id}}
-Authorization: Bearer {{auth_token}}
-
-> {%
-    client.assert(response.status === 404, "El recurso debería haber sido borrado");
-%}

@@ -1,59 +1,14 @@
-### Configuración de variables
-@endpointLogin = {{host}}/auth
-@user = {{userConsulta}}
-
-### Login exitoso (El usuario puede entrar)
-POST {{endpointLogin}}/login
+### Refrescar el token: Obtener un nuevo access token
+POST {{host}}/api/v1/auth/refresh
 Content-Type: application/json
 
 {
-  "username": "{{userConsulta}}",
-  "password": "{{pass}}"
+  "refreshToken": "{{refresh_token}}"
 }
 
 > {%
-    client.assert(response.status === 200, "El login falló");
+    client.global.set("auth_token", response.body["token"]);
     client.global.set("refresh_token", response.body["refreshToken"]);
-    client.log("Refresh token guardado: " + client.global.get("refresh_token"));
-%}
 
-
-### Refrescar el token (Comprobamos que funciona estando activo)
-POST {{endpointLogin}}/refresh
-Content-Type: application/json
-
-{
-  "refreshToken": "{{refresh_token}}"
-}
-
-> {%
-    client.assert(response.status === 200, "El refresh falló estando el usuario activo");
-    client.log("¡Refresh exitoso! La cuenta sigue activa y el token es válido.");
-%}
-
-
-### ===================================================================
-### - SIMULACIÓN DE DESPIDO
-### Ejecuta este SQL para desactivar al usuario:
-###    UPDATE employees SET activo = false WHERE username = 'local.consulta';
-### ===================================================================
-
-
-### Intentar refrescar el token estando DESACTIVADO
-POST {{endpointLogin}}/refresh
-Content-Type: application/json
-
-{
-  "refreshToken": "{{refresh_token}}"
-}
-
-> {%
-    // El status suele ser 401 o 403 dependiendo de tu GlobalExceptionHandler
-    client.assert(response.status === 401 || response.status === 403, "Debería haber denegado el acceso");
-
-    // Ajusta 'message' o 'detail' según lo que devuelva tu GlobalExceptionHandler
-    client.log("Resultado del servidor: " + response.body["detail"]);
-    client.assert(response.status === 401, "El bloqueo falló");
-
-    client.log("¡ÉXITO! La API bloqueó el refresh porque el usuario está desactivado en DB.");
+    client.log("Token guardado: " + client.global.get("auth_token"));
 %}

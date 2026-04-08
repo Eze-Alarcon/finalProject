@@ -1,144 +1,41 @@
-@endpointLogin = {{host}}/auth/login
-@endpoint = {{host}}/suppliers
-@getOne = 1
-
-### Login
-POST {{endpointLogin}}
-Content-Type: application/json
-
-{
-  "username": "{{userConsulta}}",
-  "password": "{{pass}}"
-}
-
-> {%
-    client.assert(response.status === 200, "El login falló");
-    let jwt = response.body["token"];
-    // Guardamos el token en una variable global de IntelliJ
-    client.global.set("auth_token", jwt);
-
-    client.log("¡Token capturado con éxito!");
-%}
-
-
-### Probar endpoint de traer todos
-GET {{endpoint}}
-# Aquí inyectamos la variable que acabamos de guardar
+### Obtener todos los proveedores
+GET {{host}}/api/v1/suppliers
 Authorization: Bearer {{auth_token}}
 
-
-### Probar traer solo 1
-GET {{endpoint}}/{{getOne}}
+### Obtener un proveedor por ID
+GET {{host}}/api/v1/suppliers/1
 Authorization: Bearer {{auth_token}}
 
-
-### Crear
-POST {{endpoint}}
+### Crear un nuevo proveedor
+POST {{host}}/api/v1/suppliers
 Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
 {
-  "companyName": "Nombre falso",
-  "contactName": "Alguien",
-  "contactTitle": "Owner",
-  "address": "Calle falsa 123",
-  "city": "Madrid",
-  "region": "",
-  "postalCode": "28000",
-  "country": "Spain",
-  "phone": "123456789",
-  "fax": "",
-  "homepage": ""
+  "companyName": "Suministros Globales",
+  "contactName": "Ana López",
+  "contactTitle": "Directora Comercial",
+  "address": "Avenida de la Industria 50",
+  "city": "Barcelona",
+  "region": "BCN",
+  "postalCode": "08001",
+  "country": "España",
+  "phone": "934567890",
+  "fax": "934567891",
+  "homepage": "http://www.suministrosglobales.com"
 }
 
-> {%
-    client.assert(response.status === 403, "No se ha creado, el usuario no tiene permisos");
-
-    client.log(response.body);
-%}
-
-
-
-### Login
-POST {{endpointLogin}}
-Content-Type: application/json
-
-{
-  "username": "{{userWarehouse}}",
-  "password": "{{pass}}"
-}
-
-> {%
-    client.assert(response.status === 200, "El login falló");
-    let jwt = response.body["token"];
-    // Guardamos el token en una variable global de IntelliJ
-    client.global.set("auth_token", jwt);
-
-    client.log("¡Token capturado con éxito!");
-%}
-
-
-### Crear
-POST {{endpoint}}
+### Actualización Parcial (PATCH/PUT) - Solo 1 o 2 campos
+# Probamos que el resto de campos (como address, country, etc.) no se sobreescriban con null
+PATCH {{host}}/api/v1/suppliers/1
 Content-Type: application/json
 Authorization: Bearer {{auth_token}}
 
 {
-  "companyName": "Nombre falso",
-  "contactName": "Alguien",
-  "contactTitle": "Owner",
-  "address": "Calle falsa 123",
-  "city": "Madrid",
-  "region": "",
-  "postalCode": "28000",
-  "country": "Spain",
-  "phone": "123456789",
-  "fax": "",
-  "homepage": ""
+  "companyName": "Suministros Globales S.L.",
+  "contactName": "Ana López Martínez"
 }
 
-> {%
-    client.assert(response.status === 201, "No se ha creado el estado");
-
-    let nuevoId = response.body["supplierId"];
-
-    // Lo guardamos en una variable global
-    client.global.set("created_supplier_id", nuevoId);
-
-    client.log("Supplier creado con el ID: " + nuevoId);
-%}
-
-
-### Probar verificar creacion
-GET {{endpoint}}/{{created_supplier_id}}
-Authorization: Bearer {{auth_token}}
-
-
-### Actualizar (hay que enviar todo el objeto)
-PUT {{endpoint}}/{{created_supplier_id}}
-Content-Type: application/json
-Authorization: Bearer {{auth_token}}
-
-{
-  "companyName": "Nombre falso",
-  "contactName": "Alguien",
-  "contactTitle": "Empleado mentiroso",
-  "address": "Calle falsa 1234",
-  "city": "Madrid",
-  "region": "",
-  "postalCode": "28010",
-  "country": "Spain",
-  "phone": "123456789",
-  "fax": "",
-  "homepage": ""
-}
-
-
-### Borrar
-DELETE {{endpoint}}/{{created_supplier_id}}
-Authorization: Bearer {{auth_token}}
-
-
-### Comprobar borrado
-GET {{endpoint}}/{{created_supplier_id}}
+### Eliminar un proveedor
+DELETE {{host}}/api/v1/suppliers/1
 Authorization: Bearer {{auth_token}}
