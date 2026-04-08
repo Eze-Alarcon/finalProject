@@ -3,6 +3,7 @@ package org.ezequiel.proyectofinal.features.sales.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.ezequiel.proyectofinal.core.exceptions.BadRequestException;
 import org.ezequiel.proyectofinal.core.exceptions.ConflictException;
+import org.ezequiel.proyectofinal.core.exceptions.InsufficientStockException;
 import org.ezequiel.proyectofinal.core.exceptions.ResourceNotFoundException;
 import org.ezequiel.proyectofinal.features.catalog.entity.Product;
 import org.ezequiel.proyectofinal.features.catalog.repository.ProductRepository;
@@ -60,6 +61,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderMapper.toEntity(dto);
         resolveRelations(order, dto);
         order.setStatus(OrderStatus.PENDING);
+        order.setShippedDate(null); // Aseguramos que un pedido nuevo no tenga fecha de envío
 
         if (dto.getDetails() != null) {
             for (OrderDetailRequestDTO detailDTO : dto.getDetails()) {
@@ -67,15 +69,15 @@ public class OrderServiceImpl implements OrderService {
                         .orElseThrow(() -> new ResourceNotFoundException("Product", detailDTO.getProductId()));
 
                 if (product.getDiscontinued() != 0) {
-                    throw new RuntimeException("Product " + product.getProductName() + " is discontinued");
+                    throw new BadRequestException("Product " + product.getProductName() + " is discontinued");
                 }
 
                 if (product.getUnitsInStock() < detailDTO.getQuantity()) {
-                    throw new RuntimeException("Insufficient stock for product: " + product.getProductName());
+                    throw new InsufficientStockException("Insufficient stock for product: " + product.getProductName());
                 }
 
                 product.setUnitsInStock((short) (product.getUnitsInStock() - detailDTO.getQuantity()));
-                short onOrder = product.getUnitsOnOrder() != null ? product.getUnitsOnOrder() : 0;
+                short onOrder = product.getUnitsOnOrder() != null ? product.getUnitsOnOrder() : 0; // por si el valor es null
                 product.setUnitsOnOrder((short) (onOrder + detailDTO.getQuantity()));
                 productRepository.save(product);
 

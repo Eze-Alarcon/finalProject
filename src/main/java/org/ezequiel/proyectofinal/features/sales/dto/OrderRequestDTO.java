@@ -24,8 +24,6 @@ public class OrderRequestDTO {
 
     private LocalDate requiredDate;
 
-    private LocalDate shippedDate;
-
     private Short shipperId;
 
     private Float freight;
