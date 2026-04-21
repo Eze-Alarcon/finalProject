@@ -1,20 +1,11 @@
 spring:
   application:
     name: proyecto-final-backend
-  datasource:
-    url: jdbc:postgresql://localhost:5432/northwind
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
   flyway:
     baseline-on-migrate: true # Esto porque la db ya existe y tiene datos
-  jpa:
-    show-sql: true
-    properties:
-      hibernate:
-        generate_statistics: true
-        format_sql: true
-        highlight_sql: true
+  profiles:
+    active: dev
   jwt:
-    secret: ${JWT_SECRET}
+    secret: ${SPRING_JWT_SECRET}
     accessTokenExpiration: 900 # 15 minutes
     refreshTokenExpiration: 604800 # 7 days
