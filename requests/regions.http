@@ -1,0 +1,30 @@
+### Obtener todas las regiones
+GET {{host}}/api/v1/regions
+Authorization: Bearer {{auth_token}}
+
+### Obtener una región por ID
+GET {{host}}/api/v1/regions/1
+Authorization: Bearer {{auth_token}}
+
+### Crear una nueva región
+POST {{host}}/api/v1/regions
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "regionDescription": "Norte"
+}
+
+### Actualización (PUT)
+# Como RegionRequestDTO solo tiene un campo relevante, enviamos ese campo.
+PUT {{host}}/api/v1/regions/1
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "regionDescription": "Norte Actualizado"
+}
+
+### Eliminar una región
+DELETE {{host}}/api/v1/regions/1
+Authorization: Bearer {{auth_token}}

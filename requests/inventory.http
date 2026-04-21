@@ -1,0 +1,16 @@
+### Obtener alertas de stock bajo (Low Stock)
+GET {{host}}/api/v1/inventory/alerts/low-stock
+Authorization: Bearer {{auth_token}}
+
+### Consultar stock de un producto por ID
+GET {{host}}/api/v1/products/1
+Authorization: Bearer {{auth_token}}
+
+### Reponer stock (Restock) - Misma funcionalidad que en products.http
+PATCH {{host}}/api/v1/products/1/restock
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "quantity": 50
+}

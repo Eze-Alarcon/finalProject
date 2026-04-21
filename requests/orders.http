@@ -1,0 +1,56 @@
+### Listar todas las órdenes
+GET {{host}}/api/v1/orders
+Authorization: Bearer {{auth_token}}
+
+### Obtener una orden por ID
+GET {{host}}/api/v1/orders/1
+Authorization: Bearer {{auth_token}}
+
+### Crear una nueva orden
+POST {{host}}/api/v1/orders
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "customerId": "ALFKI",
+  "employeeId": 1,
+  "orderDate": "2024-04-08",
+  "requiredDate": "2024-04-15",
+  "shipperId": 1,
+  "freight": 32.50,
+  "shipName": "Alfred's Futterkiste",
+  "shipAddress": "Obere Str. 57",
+  "shipCity": "Berlin",
+  "shipCountry": "Germany",
+  "details": [
+    {
+      "productId": 1,
+      "unitPrice": 18.00,
+      "quantity": 5,
+      "discount": 0.0
+    }
+  ]
+}
+
+### Actualización Parcial de una orden (PATCH)
+# Ejemplo: cambiando solo el transportista (shipperId)
+PATCH {{host}}/api/v1/orders/1
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "shipperId": 2
+}
+
+### Marcar orden como enviada (Ship)
+# Esto asignará automáticamente la fecha de envío actual
+PATCH {{host}}/api/v1/orders/1/ship
+Authorization: Bearer {{auth_token}}
+
+### Cancelar una orden
+PATCH {{host}}/api/v1/orders/1/cancel
+Authorization: Bearer {{auth_token}}
+
+### Eliminar una orden (Deprecated)
+DELETE {{host}}/api/v1/orders/1
+Authorization: Bearer {{auth_token}}

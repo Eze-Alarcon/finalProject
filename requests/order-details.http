@@ -1,0 +1,11 @@
+### Obtener todas las líneas de pedido
+GET {{host}}/api/v1/order-details
+Authorization: Bearer {{auth_token}}
+
+### Obtener una línea de pedido específica por Order ID y Product ID
+GET {{host}}/api/v1/order-details/order/1/product/1
+Authorization: Bearer {{auth_token}}
+
+### Eliminar una línea de pedido (Deprecated)
+DELETE {{host}}/api/v1/order-details/order/1/product/1
+Authorization: Bearer {{auth_token}}

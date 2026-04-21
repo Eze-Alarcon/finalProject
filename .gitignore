@@ -318,3 +318,6 @@ Temporary Items
 .ionide
 
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,java,macos,linux,jetbrains,intellij
+/.env
+/requests/http-client.env.json
+/requests/http-client.private.env.json

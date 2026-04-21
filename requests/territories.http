@@ -1,0 +1,32 @@
+### Obtener todos los territorios
+GET {{host}}/api/v1/territories
+Authorization: Bearer {{auth_token}}
+
+### Obtener un territorio por ID
+GET {{host}}/api/v1/territories/01581
+Authorization: Bearer {{auth_token}}
+
+### Crear un nuevo territorio
+POST {{host}}/api/v1/territories
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "territoryId": "99999",
+  "territoryDescription": "Zona de Pruebas",
+  "regionId": 1
+}
+
+### Actualización Parcial (PATCH/PUT) - Solo 1 campo
+# Se envía solo la descripción para verificar que la región no cambie
+PUT {{host}}/api/v1/territories/99999
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "territoryDescription": "Zona de Pruebas Actualizada"
+}
+
+### Eliminar un territorio
+DELETE {{host}}/api/v1/territories/99999
+Authorization: Bearer {{auth_token}}

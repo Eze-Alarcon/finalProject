@@ -1,0 +1,55 @@
+### Obtener todos los productos (con paginación y búsqueda)
+# Este endpoint es el principal para búsqueda avanzada
+GET {{host}}/api/v1/products?categoryId=1&inStock=true&page=0&size=10
+Authorization: Bearer {{auth_token}}
+
+### Búsqueda avanzada combinando más filtros
+GET {{host}}/api/v1/products?supplierId=1&minPrice=10&maxPrice=100&page=0&size=20
+Authorization: Bearer {{auth_token}}
+
+### Obtener un producto por ID
+GET {{host}}/api/v1/products/1
+Authorization: Bearer {{auth_token}}
+
+### Crear un nuevo producto
+POST {{host}}/api/v1/products
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "productName": "Laptop Gaming X1",
+  "supplierId": 1,
+  "categoryId": 2,
+  "quantityPerUnit": "1 unit",
+  "unitPrice": 1200.50,
+  "unitsInStock": 50,
+  "reorderLevel": 10
+}
+
+### Actualización Parcial (PATCH/PUT) - Solo 2 campos
+# Verificamos que no se sobreescriban los demás campos con null
+PATCH {{host}}/api/v1/products/1
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "unitPrice": 1250.00,
+  "unitsInStock": 45
+}
+
+### Reponer stock (Restock)
+PATCH {{host}}/api/v1/products/1/restock
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "quantity": 20
+}
+
+### Marcar producto como descontinuado
+PATCH {{host}}/api/v1/products/1/discontinue
+Authorization: Bearer {{auth_token}}
+
+### Eliminar un producto
+DELETE {{host}}/api/v1/products/1
+Authorization: Bearer {{auth_token}}

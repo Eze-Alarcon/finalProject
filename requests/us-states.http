@@ -1,0 +1,32 @@
+### Obtener todos los estados de EE.UU.
+GET {{host}}/api/v1/us-states
+Authorization: Bearer {{auth_token}}
+
+### Obtener un estado por ID
+GET {{host}}/api/v1/us-states/1
+Authorization: Bearer {{auth_token}}
+
+### Crear un nuevo estado
+POST {{host}}/api/v1/us-states
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "stateName": "Nuevo Estado",
+  "stateAbbr": "NE",
+  "stateRegion": "Norte"
+}
+
+### Actualización Parcial (PATCH/PUT) - Solo 1 campo
+# Se envía solo el nombre para verificar que la abreviación y región no se borren
+PUT {{host}}/api/v1/us-states/1
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "stateName": "Estado Modificado"
+}
+
+### Eliminar un estado
+DELETE {{host}}/api/v1/us-states/1
+Authorization: Bearer {{auth_token}}

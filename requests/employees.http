@@ -1,0 +1,74 @@
+### Obtener todos los empleados
+GET {{host}}/api/v1/employees
+Authorization: Bearer {{auth_token}}
+
+### Obtener un empleado por ID
+GET {{host}}/api/v1/employees/1
+Authorization: Bearer {{auth_token}}
+
+### Crear un nuevo empleado
+POST {{host}}/api/v1/employees
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "lastName": "García",
+  "firstName": "Juan",
+  "title": "Representante de Ventas",
+  "titleOfCourtesy": "Sr.",
+  "birthDate": "1990-05-15",
+  "hireDate": "2023-01-10",
+  "address": "Calle Falsa 123",
+  "city": "Madrid",
+  "region": "MD",
+  "postalCode": "28001",
+  "country": "España",
+  "homePhone": "912345678",
+  "extension": "123",
+  "notes": "Empleado de prueba",
+  "reportsToId": 1,
+  "photoPath": "/photos/jgarcia.jpg"
+}
+
+### Actualización Parcial (PATCH) - Solo 1 o 2 campos
+# Este ejemplo demuestra que los campos no enviados no se sobreescriben con null
+PATCH {{host}}/api/v1/employees/1
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "lastName": "García Modificado",
+  "title": "Gerente de Ventas"
+}
+
+### Actualización Total (PUT)
+PUT {{host}}/api/v1/employees/1
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "lastName": "García",
+  "firstName": "Juan",
+  "title": "Representante de Ventas",
+  "titleOfCourtesy": "Sr.",
+  "birthDate": "1990-05-15",
+  "hireDate": "2023-01-10",
+  "address": "Calle Real 456",
+  "city": "Madrid",
+  "region": "MD",
+  "postalCode": "28001",
+  "country": "España",
+  "homePhone": "912345678",
+  "extension": "123",
+  "notes": "Empleado de prueba con dirección actualizada",
+  "reportsToId": 1,
+  "photoPath": "/photos/jgarcia.jpg"
+}
+
+### Eliminar un empleado
+DELETE {{host}}/api/v1/employees/1
+Authorization: Bearer {{auth_token}}
+
+### Obtener detalles agrupados de empleados
+GET {{host}}/api/v1/employee-details
+Authorization: Bearer {{auth_token}}

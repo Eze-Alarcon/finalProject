@@ -10,7 +10,7 @@
     </parent>
     <groupId>org.ezequiel</groupId>
     <artifactId>proyectofinal</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>proyectofinal</name>
     <description>proyectofinal</description>
     <url/>
@@ -27,7 +27,7 @@
         <url/>
     </scm>
     <properties>
-        <java.version>21</java.version>
+        <java.version>17</java.version>
     </properties>
     <dependencies>
         <dependency>
@@ -51,27 +51,26 @@
             <artifactId>spring-boot-starter-data-jpa</artifactId>
             <groupId>org.springframework.boot</groupId>
         </dependency>
+
         <dependency>
-            <artifactId>mysql-connector-j</artifactId>
-            <groupId>com.mysql</groupId>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-database-postgresql</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
         </dependency>
-        <dependency>
-            <artifactId>flyway-core</artifactId>
-            <groupId>org.flywaydb</groupId>
-        </dependency>
-        <dependency>
-            <artifactId>flyway-mysql</artifactId>
-            <groupId>org.flywaydb</groupId>
-        </dependency>
+        <!-- Source: https://mvnrepository.com/artifact/org.projectlombok/lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <scope>annotationProcessor</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+            <version>1.18.44</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <artifactId>mapstruct-processor</artifactId>
@@ -103,27 +102,26 @@
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- Source: https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-impl -->
         <dependency>
-            <groupId>org.thymeleaf.extras</groupId>
-            <artifactId>thymeleaf-extras-springsecurity6</artifactId>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>0.12.7</version>
+            <scope>runtime</scope>
+        </dependency>
+        <!-- Source: https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-jackson -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>0.12.7</version>
+            <scope>runtime</scope>
         </dependency>
         <!-- Source: https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-api -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-impl</artifactId>
-            <version>0.12.6</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-jackson</artifactId>
-            <version>0.12.5</version>
-        </dependency>
-
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-api</artifactId>
-            <version>0.12.6</version>
+            <version>0.12.7</version>
+            <scope>compile</scope>
         </dependency>
 
         <!-- Source: https://mvnrepository.com/artifact/me.paulschwarz/spring-dotenv -->
@@ -136,15 +134,30 @@
 
     <build>
         <plugins>
+
             <plugin>
-                <groupId>org.flywaydb</groupId>
-                <artifactId>flyway-maven-plugin</artifactId>
-                <version>11.14.1</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <url>jdbc:mysql://localhost:3306/appdb?createDatabaseIfNotExist=true</url>
-                    <user>app</user>
-                    <password>app_pass</password>
-                    <cleanDisabled>false</cleanDisabled>
+                    <source>17</source>
+                    <target>17</target>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>1.6.3</version>
+                        </path>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok-mapstruct-binding</artifactId>
+                            <version>0.2.0</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
 

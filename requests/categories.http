@@ -1,0 +1,31 @@
+### Obtener todas las categorías
+GET {{host}}/api/v1/categories
+Authorization: Bearer {{auth_token}}
+
+### Obtener una categoría por ID
+GET {{host}}/api/v1/categories/1
+Authorization: Bearer {{auth_token}}
+
+### Crear una nueva categoría
+POST {{host}}/api/v1/categories
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "categoryName": "Electrónica",
+  "description": "Dispositivos electrónicos y gadgets"
+}
+
+### Actualización Parcial (PATCH/PUT) - Solo 1 campo
+# Se envía solo la descripción para verificar que el nombre no se pierda
+PATCH {{host}}/api/v1/categories/1
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "description": "Nueva descripción de la categoría"
+}
+
+### Eliminar una categoría
+DELETE {{host}}/api/v1/categories/1
+Authorization: Bearer {{auth_token}}

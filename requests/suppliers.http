@@ -1,0 +1,41 @@
+### Obtener todos los proveedores
+GET {{host}}/api/v1/suppliers
+Authorization: Bearer {{auth_token}}
+
+### Obtener un proveedor por ID
+GET {{host}}/api/v1/suppliers/1
+Authorization: Bearer {{auth_token}}
+
+### Crear un nuevo proveedor
+POST {{host}}/api/v1/suppliers
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "companyName": "Suministros Globales",
+  "contactName": "Ana López",
+  "contactTitle": "Directora Comercial",
+  "address": "Avenida de la Industria 50",
+  "city": "Barcelona",
+  "region": "BCN",
+  "postalCode": "08001",
+  "country": "España",
+  "phone": "934567890",
+  "fax": "934567891",
+  "homepage": "http://www.suministrosglobales.com"
+}
+
+### Actualización Parcial (PATCH/PUT) - Solo 1 o 2 campos
+# Probamos que el resto de campos (como address, country, etc.) no se sobreescriban con null
+PATCH {{host}}/api/v1/suppliers/1
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "companyName": "Suministros Globales S.L.",
+  "contactName": "Ana López Martínez"
+}
+
+### Eliminar un proveedor
+DELETE {{host}}/api/v1/suppliers/1
+Authorization: Bearer {{auth_token}}

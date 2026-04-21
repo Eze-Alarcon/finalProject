@@ -1,0 +1,21 @@
+### Obtener todas las relaciones empleado-territorio
+GET {{host}}/api/v1/employee-territories
+Authorization: Bearer {{auth_token}}
+
+### Obtener territorios de un empleado específico
+GET {{host}}/api/v1/employee-territories/employee/1
+Authorization: Bearer {{auth_token}}
+
+### Asignar un territorio a un empleado
+POST {{host}}/api/v1/employee-territories
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "employeeId": 1,
+  "territoryId": "01581"
+}
+
+### Eliminar la asignación de un territorio a un empleado
+DELETE {{host}}/api/v1/employee-territories/employee/1/territory/01581
+Authorization: Bearer {{auth_token}}

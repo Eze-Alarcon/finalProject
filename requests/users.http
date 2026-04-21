@@ -1,0 +1,41 @@
+### Crear un nuevo usuario (Solo ADMIN)
+POST {{host}}/api/v1/users
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "username": "nuevo_usuario",
+  "password": "password123",
+  "role": "ROLE_USER",
+  "employeeId": 1
+}
+
+### Cambiar contraseña de un usuario
+PATCH {{host}}/api/v1/users/1/password
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "oldPassword": "password123",
+  "newPassword": "newPassword456"
+}
+
+### Cambiar el rol de un usuario (Solo ADMIN)
+PATCH {{host}}/api/v1/users/1/role
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "role": "ROLE_ADMIN"
+}
+
+### Habilitar/Deshabilitar usuario (Solo ADMIN)
+PATCH {{host}}/api/v1/users/1/status
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+false
+
+### Listar todos los usuarios (Solo ADMIN)
+GET {{host}}/api/v1/users
+Authorization: Bearer {{auth_token}}

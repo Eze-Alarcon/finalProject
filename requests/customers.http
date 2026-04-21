@@ -1,0 +1,45 @@
+### Obtener todos los clientes
+GET {{host}}/api/v1/customers
+Authorization: Bearer {{auth_token}}
+
+### Obtener un cliente por ID
+GET {{host}}/api/v1/customers/ALFKI
+Authorization: Bearer {{auth_token}}
+
+### Crear un nuevo cliente
+POST {{host}}/api/v1/customers
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "customerId": "NUEVO",
+  "companyName": "Empresa de Prueba",
+  "contactName": "Juan Pérez",
+  "contactTitle": "Gerente",
+  "address": "Calle Mayor 1",
+  "city": "Madrid",
+  "region": "MD",
+  "postalCode": "28001",
+  "country": "España",
+  "phone": "912345678",
+  "fax": "912345679"
+}
+
+### Actualización Parcial (PATCH/PUT) - Solo 1 o 2 campos
+# Probamos que el resto de campos (como address, city, etc.) no se sobreescriban con null
+PATCH {{host}}/api/v1/customers/ALFKI
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "contactName": "Contacto Actualizado",
+  "phone": "600000000"
+}
+
+### Obtener historial de compras del cliente
+GET {{host}}/api/v1/customers/ALFKI/orders?page=0&size=10
+Authorization: Bearer {{auth_token}}
+
+### Eliminar un cliente
+DELETE {{host}}/api/v1/customers/NUEVO
+Authorization: Bearer {{auth_token}}

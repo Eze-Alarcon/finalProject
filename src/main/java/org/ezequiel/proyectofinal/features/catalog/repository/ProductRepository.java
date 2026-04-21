@@ -1,0 +1,23 @@
+package org.ezequiel.proyectofinal.features.catalog.repository;
+
+import org.ezequiel.proyectofinal.features.catalog.entity.Product;
+import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface ProductRepository extends JpaRepository<Product, Short>, JpaSpecificationExecutor<Product> {
+
+    @EntityGraph(attributePaths = {"category", "supplier"})
+    List<Product> findAll();
+
+    @EntityGraph(attributePaths = {"category", "supplier"})
+    java.util.Optional<Product> findById(Short id);
+
+    @EntityGraph(attributePaths = {"supplier"})
+    @org.springframework.data.jpa.repository.Query("SELECT p FROM Product p WHERE p.unitsInStock <= p.reorderLevel AND p.discontinued = 0")
+    List<Product> findLowStockProducts();
+}

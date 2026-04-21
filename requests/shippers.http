@@ -1,0 +1,31 @@
+### Obtener todos los transportistas
+GET {{host}}/api/v1/shippers
+Authorization: Bearer {{auth_token}}
+
+### Obtener un transportista por ID
+GET {{host}}/api/v1/shippers/1
+Authorization: Bearer {{auth_token}}
+
+### Crear un nuevo transportista
+POST {{host}}/api/v1/shippers
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "companyName": "Express Shipping",
+  "phone": "555-0123"
+}
+
+### Actualización Parcial (PATCH/PUT) - Solo 1 campo
+# Se envía solo el nombre de la compañía para verificar que el teléfono no se borre
+PATCH {{host}}/api/v1/shippers/1
+Content-Type: application/json
+Authorization: Bearer {{auth_token}}
+
+{
+  "companyName": "Express Shipping International"
+}
+
+### Eliminar un transportista
+DELETE {{host}}/api/v1/shippers/1
+Authorization: Bearer {{auth_token}}
