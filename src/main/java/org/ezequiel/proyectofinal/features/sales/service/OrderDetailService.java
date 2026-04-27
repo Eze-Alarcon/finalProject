@@ -1,6 +1,5 @@
 package org.ezequiel.proyectofinal.features.sales.service;
 
-import org.ezequiel.proyectofinal.features.sales.dto.OrderDetailRequestDTO;
 import org.ezequiel.proyectofinal.features.sales.dto.OrderDetailResponseDTO;
 
 import java.util.List;
