@@ -342,7 +342,7 @@ public class OrderController {
 
     @Operation(
             summary = "Eliminar orden (DEPRECADO)",
-            description = "Elimina permanentemente una orden del sistema. ⚠️ ESTE ENDPOINT ESTÁ DEPRECADO y se " +
+            description = "Elimina permanentemente una orden del sistema. ESTE ENDPOINT ESTÁ DEPRECADO y se " +
                     "desaconseja su uso. En su lugar, utilice el endpoint de cancelación de órdenes (/cancel) " +
                     "para mantener la integridad del historial de ventas. Solo administradores y personal de " +
                     "almacén pueden realizar esta operación irreversible.",
